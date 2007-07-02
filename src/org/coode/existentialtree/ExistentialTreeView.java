@@ -1,15 +1,17 @@
 package org.coode.existentialtree;
 
-import org.protege.editor.owl.ui.clshierarchy.AbstractOWLClassHierarchyViewComponent;
+import org.protege.editor.core.ui.view.DisposableAction;
+import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
 import org.protege.editor.owl.ui.OWLIcons;
 import org.protege.editor.owl.ui.UIHelper;
-import org.protege.editor.owl.ui.renderer.OWLObjectRenderer;
+import org.protege.editor.owl.ui.clshierarchy.AbstractOWLClassHierarchyViewComponent;
 import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
-import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.protege.editor.core.ui.view.DisposableAction;
+import org.protege.editor.owl.ui.renderer.OWLObjectRenderer;
 import org.semanticweb.owl.model.*;
 
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -150,7 +152,6 @@ public class ExistentialTreeView extends AbstractOWLClassHierarchyViewComponent 
         }
     }
 
-
     protected void updateHeader(OWLObject object) {
         String str = "(" + propertyLabel + ")";
         if (object != null){
@@ -164,6 +165,9 @@ public class ExistentialTreeView extends AbstractOWLClassHierarchyViewComponent 
     public void disposeView() {
         getOWLModelManager().removeOntologyChangeListener(ontListener);
         getOWLWorkspace().removeHierarchyListener(hListener);
+        ontListener = null;
+        hListener = null;
+        treeProvider = null;
         super.disposeView();
     }
 }
