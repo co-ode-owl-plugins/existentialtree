@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 0.4" "http://jpf.sourceforge.net/plugin_0_4.dtd">
+
+<plugin id="org.coode.existentialtree" version="1.0.0.existentialtree">
+
+    <attributes>
+        <attribute id="update-url" value="http://www.co-ode.org/downloads/protege-x/existentialtree.xml"/>
+    </attributes>
+
+    <requires>
+        <import plugin-id="org.protege.editor.core.application"/>
+        <import plugin-id="org.protege.editor.owl"/>
+    </requires>
+
+    <runtime>
+        <library id="org.coode.existentialtree.ExistentialTree" path="./" type="code">
+        </library>
+    </runtime>
+
+    <!-- Declare extension points for the app -->
+
+    <extension plugin-id="org.protege.editor.core.application" point-id="ViewComponent" id="org.coode.ExistentialTreeView">
+        <parameter id="label" value="Existential Tree"/>
+        <parameter id="class" value="org.coode.existentialtree.ExistentialTreeView"/>
+        <parameter id="headerColor" value="@org.protege.classcolor"/>
+        <parameter id="category" value="Class"/>
+    </extension>
+
+</plugin>
