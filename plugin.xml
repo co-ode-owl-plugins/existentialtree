@@ -4,7 +4,7 @@
 <plugin id="org.coode.existentialtree" version="1.0.0.existentialtree">
 
     <attributes>
-        <attribute id="update-url" value="http://www.co-ode.org/downloads/protege-x/existentialtree.xml"/>
+        <attribute id="update-url" value="http://co-ode-owl-plugins.googlecode.com/svn/trunk/existentialtree/update.xml"/>
     </attributes>
 
     <requires>
@@ -13,7 +13,7 @@
     </requires>
 
     <runtime>
-        <library id="org.coode.existentialtree.ExistentialTree" path="./" type="code">
+        <library id="org.coode.existentialtree.ExistentialTree" path="classes/" type="code">
         </library>
     </runtime>
 
