@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 0.4" "http://jpf.sourceforge.net/plugin_0_4.dtd">
 
-<plugin id="org.coode.existentialtree" version="1.0.0.existentialtree">
+<plugin id="org.coode.existentialtree" version="1.0.1.existentialtree">
 
     <attributes>
         <attribute id="update-url" value="http://co-ode-owl-plugins.googlecode.com/svn/trunk/existentialtree/update.xml"/>
@@ -24,6 +24,13 @@
         <parameter id="class" value="org.coode.existentialtree.ExistentialTreeView"/>
         <parameter id="headerColor" value="@org.protege.classcolor"/>
         <parameter id="category" value="Class"/>
+    </extension>
+
+    <extension plugin-id="org.protege.editor.core.application" point-id="ViewComponent" id="org.coode.RelationsTreeView">
+        <parameter id="label" value="Relations Tree"/>
+        <parameter id="class" value="org.coode.existentialtree.RelationsTreeView"/>
+        <parameter id="headerColor" value="@org.protege.individualcolor"/>
+        <parameter id="category" value="Individual"/>
     </extension>
 
 </plugin>
