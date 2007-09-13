@@ -1,13 +1,15 @@
 package org.coode.existentialtree;
 
-import org.semanticweb.owl.model.*;
-import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.protege.editor.owl.model.hierarchy.AbstractOWLObjectHierarchyProvider;
 import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.model.hierarchy.AbstractOWLObjectHierarchyProvider;
+import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
+import org.semanticweb.owl.model.OWLDescription;
+import org.semanticweb.owl.model.OWLObjectProperty;
+import org.semanticweb.owl.model.OWLOntology;
 
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -41,13 +43,13 @@ import java.util.Collections;
  * Date: Apr 24, 2007<br><br>
  * <p/>
  */
-public class OWLExistentialHierarchyProvider extends AbstractOWLObjectHierarchyProvider<OWLClass> {
+public class OWLExistentialHierarchyProvider extends AbstractOWLObjectHierarchyProvider<OWLDescription> {
 
     private Set<OWLOntology> ontologies;
 
     private ExistentialFillerAccumulator fillerAccumulator = new ExistentialFillerAccumulator();
 
-    private OWLClass root;
+    private OWLDescription root;
 
     private OWLObjectHierarchyProvider<OWLObjectProperty> hp;
 
@@ -62,7 +64,7 @@ public class OWLExistentialHierarchyProvider extends AbstractOWLObjectHierarchyP
         this.ontologies = ontologies;
     }
 
-    public Set<OWLClass> getRoots() {
+    public Set<OWLDescription> getRoots() {
         if (root != null){
             return Collections.singleton(root);
         }
@@ -71,28 +73,23 @@ public class OWLExistentialHierarchyProvider extends AbstractOWLObjectHierarchyP
         }
     }
 
-    public Set<OWLClass> getChildren(OWLClass object) {
-        if (object instanceof OWLClass){
-            return fillerAccumulator.getNamedExistentialFillers(object, ontologies);
-        }
-        else{
-            return Collections.EMPTY_SET;
-        }
+    public Set<OWLDescription> getChildren(OWLDescription object) {
+            return fillerAccumulator.getExistentialFillers(object, ontologies);
     }
 
-    public Set<OWLClass> getParents(OWLClass object) {
+    public Set<OWLDescription> getParents(OWLDescription object) {
         return Collections.EMPTY_SET;
     }
 
-    public Set<OWLClass> getEquivalents(OWLClass object) {
+    public Set<OWLDescription> getEquivalents(OWLDescription object) {
         return Collections.EMPTY_SET;
     }
 
-    public boolean containsReference(OWLClass object) {
+    public boolean containsReference(OWLDescription object) {
         return object.equals(root);
     }
 
-    public void setRoot(OWLClass selectedClass) {
+    public void setRoot(OWLDescription selectedClass) {
         root = selectedClass;
     }
 

@@ -3,8 +3,8 @@ package org.coode.existentialtree;
 import org.semanticweb.owl.model.*;
 import org.semanticweb.owl.util.OWLDescriptionVisitorAdapter;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -52,16 +52,21 @@ public class ExistentialFillerAccumulator extends OWLDescriptionVisitorAdapter {
         this.properties = properties;
     }
 
-    public Set<OWLDescription> getExistentialFillers(OWLClass cls, Set<OWLOntology> ontologies) {
+    public Set<OWLDescription> getExistentialFillers(OWLDescription cls, Set<OWLOntology> ontologies) {
         fillers.clear();
         onts = ontologies;
+        if (cls instanceof OWLClass){
         for (OWLOntology ont : ontologies){
-            for (OWLDescription restr : cls.getSuperClasses(ont)) {
+            for (OWLDescription restr : ((OWLClass)cls).getSuperClasses(ont)) {
                 restr.accept(this);
             }
-            for (OWLDescription restr : cls.getEquivalentClasses(ont)) {
+            for (OWLDescription restr : ((OWLClass)cls).getEquivalentClasses(ont)) {
                 restr.accept(this);
             }
+        }
+        }
+        else{
+            cls.accept(this);
         }
         return fillers;
     }
