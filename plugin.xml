@@ -1,36 +1,29 @@
 <?xml version="1.0" ?>
-<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 0.4" "http://jpf.sourceforge.net/plugin_0_4.dtd">
 
-<plugin id="org.coode.existentialtree" version="1.0.1.existentialtree">
+<plugin>
 
-    <attributes>
-        <attribute id="update-url" value="http://co-ode-owl-plugins.googlecode.com/svn/trunk/existentialtree/update.xml"/>
-    </attributes>
-
-    <requires>
-        <import plugin-id="org.protege.editor.core.application"/>
-        <import plugin-id="org.protege.editor.owl"/>
-    </requires>
-
-    <runtime>
-        <library id="org.coode.existentialtree.ExistentialTree" path="classes/" type="code">
-        </library>
-    </runtime>
-
-    <!-- Declare extension points for the app -->
-
-    <extension plugin-id="org.protege.editor.core.application" point-id="ViewComponent" id="org.coode.ExistentialTreeView">
-        <parameter id="label" value="Existential Tree"/>
-        <parameter id="class" value="org.coode.existentialtree.ExistentialTreeView"/>
-        <parameter id="headerColor" value="@org.protege.classcolor"/>
-        <parameter id="category" value="Class"/>
+    <extension id="ExistentialTreeView"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="Existential Tree"/>
+        <class value="org.coode.existentialtree.view.ExistentialTreeView"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="@org.protege.classcategory"/>
     </extension>
 
-    <extension plugin-id="org.protege.editor.core.application" point-id="ViewComponent" id="org.coode.RelationsTreeView">
-        <parameter id="label" value="Relations Tree"/>
-        <parameter id="class" value="org.coode.existentialtree.RelationsTreeView"/>
-        <parameter id="headerColor" value="@org.protege.individualcolor"/>
-        <parameter id="category" value="Individual"/>
+    <extension id="ExistentialTreeView2"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="Existential Tree 2"/>
+        <class value="org.coode.existentialtree.view.ExistentialTreeView2"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="@org.protege.classcategory"/>
+    </extension>
+
+    <extension id="RelationsTreeView"
+     		   point="org.protege.editor.core.application.ViewComponent">
+        <label value="Relations Tree"/>
+        <class value="org.coode.existentialtree.view.RelationsTreeView"/>
+        <headerColor value="@org.protege.individualcolor"/>
+        <category value="@org.protege.individualcategory"/>
     </extension>
 
 </plugin>

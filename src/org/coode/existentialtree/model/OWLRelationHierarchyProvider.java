@@ -1,7 +1,6 @@
-package org.coode.existentialtree;
+package org.coode.existentialtree.model;
 
 import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.model.hierarchy.AbstractOWLObjectHierarchyProvider;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
 import org.semanticweb.owl.model.OWLIndividual;
 import org.semanticweb.owl.model.OWLObjectProperty;
@@ -40,7 +39,7 @@ import java.util.*;
  * Bio Health Informatics Group<br>
  * Date: Sep 13, 2007<br><br>
  */
-public class OWLRelationHierarchyProvider extends AbstractOWLObjectHierarchyProvider<OWLIndividual> {
+public class OWLRelationHierarchyProvider extends AbstractHierarchyProvider<OWLIndividual> {
 
     private Set<OWLOntology> ontologies;
 
@@ -50,7 +49,7 @@ public class OWLRelationHierarchyProvider extends AbstractOWLObjectHierarchyProv
 
     private Set<OWLObjectProperty> propAndDescendants = new HashSet<OWLObjectProperty>();
 
-    protected OWLRelationHierarchyProvider(OWLModelManager owlOntologyManager) {
+    public OWLRelationHierarchyProvider(OWLModelManager owlOntologyManager) {
         super(owlOntologyManager.getOWLOntologyManager());
         ontologies = owlOntologyManager.getOntologies();
         hp = owlOntologyManager.getOWLObjectPropertyHierarchyProvider();

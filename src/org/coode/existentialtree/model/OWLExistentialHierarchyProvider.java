@@ -1,7 +1,7 @@
-package org.coode.existentialtree;
+package org.coode.existentialtree.model;
 
+import org.coode.existentialtree.util.ExistentialFillerAccumulator;
 import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.model.hierarchy.AbstractOWLObjectHierarchyProvider;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
 import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLObjectProperty;
@@ -43,7 +43,7 @@ import java.util.Set;
  * Date: Apr 24, 2007<br><br>
  * <p/>
  */
-public class OWLExistentialHierarchyProvider extends AbstractOWLObjectHierarchyProvider<OWLDescription> {
+public class OWLExistentialHierarchyProvider extends AbstractHierarchyProvider<OWLDescription> {
 
     private Set<OWLOntology> ontologies;
 
@@ -53,7 +53,7 @@ public class OWLExistentialHierarchyProvider extends AbstractOWLObjectHierarchyP
 
     private OWLObjectHierarchyProvider<OWLObjectProperty> hp;
 
-    protected OWLExistentialHierarchyProvider(OWLModelManager owlOntologyManager) {
+    public OWLExistentialHierarchyProvider(OWLModelManager owlOntologyManager) {
         super(owlOntologyManager.getOWLOntologyManager());
         ontologies = owlOntologyManager.getOntologies();
         root = owlOntologyManager.getOWLDataFactory().getOWLThing();

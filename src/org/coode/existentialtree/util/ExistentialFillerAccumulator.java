@@ -1,4 +1,4 @@
-package org.coode.existentialtree;
+package org.coode.existentialtree.util;
 
 import org.semanticweb.owl.model.*;
 import org.semanticweb.owl.util.OWLDescriptionVisitorAdapter;
@@ -37,6 +37,7 @@ import java.util.Set;
  * Bio Health Informatics Group<br>
  * Date: Apr 24, 2007<br><br>
  * <p/>
+ * Also accumulates inherited restrictions
  */
 public class ExistentialFillerAccumulator extends OWLDescriptionVisitorAdapter {
 
@@ -56,14 +57,14 @@ public class ExistentialFillerAccumulator extends OWLDescriptionVisitorAdapter {
         fillers.clear();
         onts = ontologies;
         if (cls instanceof OWLClass){
-        for (OWLOntology ont : ontologies){
-            for (OWLDescription restr : ((OWLClass)cls).getSuperClasses(ont)) {
-                restr.accept(this);
+            for (OWLOntology ont : ontologies){
+                for (OWLDescription restr : ((OWLClass)cls).getSuperClasses(ont)) {
+                    restr.accept(this);
+                }
+                for (OWLDescription restr : ((OWLClass)cls).getEquivalentClasses(ont)) {
+                    restr.accept(this);
+                }
             }
-            for (OWLDescription restr : ((OWLClass)cls).getEquivalentClasses(ont)) {
-                restr.accept(this);
-            }
-        }
         }
         else{
             cls.accept(this);
@@ -81,7 +82,7 @@ public class ExistentialFillerAccumulator extends OWLDescriptionVisitorAdapter {
         return results;
     }
 
-
+    // Named supers are also queried for inherited restrictions
     public void visit(OWLClass desc) {
         ExistentialFillerAccumulator acc = new ExistentialFillerAccumulator(properties);
         fillers.addAll(acc.getExistentialFillers(desc, onts));
