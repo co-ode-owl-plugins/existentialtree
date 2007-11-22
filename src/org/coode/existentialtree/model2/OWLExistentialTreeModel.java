@@ -1,8 +1,9 @@
 package org.coode.existentialtree.model2;
 
 import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLObjectProperty;
 import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owl.model.OWLPropertyExpression;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -50,10 +51,15 @@ public class OWLExistentialTreeModel implements TreeModel {
 
     private List<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
 
-    private Set<OWLObjectProperty> props;
+    private Set<OWLPropertyExpression> props;
     private Set<OWLOntology> onts;
+    private OWLOntologyManager mngr;
+    private int min = 1;
 
-    public OWLExistentialTreeModel(Set<OWLOntology> onts, Comparator<ExistentialNode> comparator) {
+    public OWLExistentialTreeModel(OWLOntologyManager mngr,
+                                   Set<OWLOntology> onts,
+                                   Comparator<ExistentialNode> comparator) {
+        this.mngr = mngr;
         this.onts = onts;
         this.comparator = comparator;
     }
@@ -106,14 +112,27 @@ public class OWLExistentialTreeModel implements TreeModel {
         return comparator;
     }
 
-    public void setProperties(Set<OWLObjectProperty> props) {
+    public void setProperties(Set<OWLPropertyExpression> props) {
         this.props = props;
         for (TreeModelListener l : listeners){
             l.treeStructureChanged(new TreeModelEvent(this, new Object[]{root}));
         }
     }
 
-    public Set<OWLObjectProperty> getProperties(){
+    public Set<OWLPropertyExpression> getProperties(){
         return props;
+    }
+
+    public OWLClass getOWLThing() {
+        return mngr.getOWLDataFactory().getOWLThing();
+    }
+
+    public int getMin() {
+        return min;
+    }
+
+    public void setMin(int m){
+        min = m;
+        setRoot((OWLClass)root.getUserObject()); // regenerate the root object
     }
 }

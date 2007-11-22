@@ -1,7 +1,8 @@
 package org.coode.existentialtree.model2;
 
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.model.OWLDataRange;
 
+import java.util.Collections;
 import java.util.List;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -32,13 +33,25 @@ import java.util.List;
  * <p/>
  * The University Of Manchester<br>
  * Bio Health Informatics Group<br>
- * Date: Oct 29, 2007<br><br>
+ * Date: Nov 2, 2007<br><br>
  */
-public interface ExistentialNode<O extends OWLObject> {
+public class OWLDataRangeNode implements ExistentialNode<OWLDataRange> {
 
-    public O getUserObject();
+    private OWLDataRange range;
 
-    public O getRenderedObject();
+    public OWLDataRangeNode(OWLDataRange range) {
+        this.range = range;
+    }
 
-    public List<ExistentialNode> getChildren();
+    public OWLDataRange getUserObject() {
+        return range;
+    }
+
+    public OWLDataRange getRenderedObject() {
+        return range;
+    }
+
+    public List getChildren() {
+        return Collections.EMPTY_LIST;
+    }
 }

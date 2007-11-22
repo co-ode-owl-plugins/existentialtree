@@ -1,10 +1,10 @@
 package org.coode.existentialtree.model2;
 
 import org.coode.existentialtree.util.AxiomAccumulator;
+import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.model.OWLObjectProperty;
-import org.semanticweb.owl.model.OWLObjectPropertyExpression;
+import org.semanticweb.owl.model.OWLPropertyExpression;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -56,21 +56,30 @@ public class OWLDescriptionNode implements ExistentialNode<OWLDescription> {
         return descr;
     }
 
+    public OWLDescription getRenderedObject() {
+        if (descr instanceof OWLClass){
+            return descr;
+        }
+        else{
+            return model.getOWLThing();
+        }
+    }
+
     public List<ExistentialNode> getChildren() {
         if (children == null){
             children = new ArrayList<ExistentialNode>();
-            AxiomAccumulator acc = new AxiomAccumulator(descr, model.getOntologies());
+            AxiomAccumulator acc = new AxiomAccumulator(descr, model.getOntologies(), model.getMin());
             Set<OWLObject> objects = acc.getObjectsForDescription();
             if (!objects.isEmpty()){
-                Set<OWLObjectProperty> filterproperties = model.getProperties();
-                Set<OWLObjectPropertyExpression> properties;
+                Set<OWLPropertyExpression> filterproperties = model.getProperties();
+                Set<OWLPropertyExpression> properties;
                 if (filterproperties == null){
                     properties = acc.getUsedProperties();
                 }
                 else{
-                    properties = new HashSet<OWLObjectPropertyExpression>(filterproperties);
+                    properties = new HashSet<OWLPropertyExpression>(filterproperties);
                 }
-                for (OWLObjectPropertyExpression prop : properties){
+                for (OWLPropertyExpression prop : properties){
                     Set<OWLObject> owlAxioms = acc.filterObjectsForProp(prop);
                     if (owlAxioms != null){
                         children.add(new PropertyNode(owlAxioms, this, prop, model));
@@ -84,7 +93,6 @@ public class OWLDescriptionNode implements ExistentialNode<OWLDescription> {
     public String toString() {
         return getUserObject().toString();
     }
-
 
     public boolean equals(Object object) {
         return descr.equals(((OWLDescriptionNode)object).getUserObject());

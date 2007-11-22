@@ -43,18 +43,19 @@ public class AxiomAccumulator {
 
     private Set<OWLObject> allObjects = new HashSet<OWLObject>();
 
-    private Map<OWLObjectPropertyExpression, Set<OWLObject>> existentialPropMap =
-            new HashMap<OWLObjectPropertyExpression, Set<OWLObject>>();
-
+    private Map<OWLPropertyExpression, Set<OWLObject>> existentialPropMap =
+            new HashMap<OWLPropertyExpression, Set<OWLObject>>();
 
     private boolean getInherited = true;
     private boolean axiomCacheBuilt = false;
     private OWLDescription base;
     private Set<OWLOntology> onts;
+    private int min;
 
-    public AxiomAccumulator(OWLDescription cls, Set<OWLOntology> onts) {
+    public AxiomAccumulator(OWLDescription cls, Set<OWLOntology> onts, int min) {
         this.base = cls;
         this.onts = onts;
+        this.min = min;
         if (cls instanceof OWLClass){
             for (OWLOntology ont : onts){
                 allObjects.addAll(ont.getSubClassAxiomsForLHS((OWLClass)cls));
@@ -62,7 +63,7 @@ public class AxiomAccumulator {
                 if (getInherited){
                     for (OWLDescription descr : ((OWLClass)cls).getSuperClasses(ont)){
                         if (descr instanceof OWLClass){
-                            allObjects.addAll(new AxiomAccumulator(descr, onts).getObjectsForDescription());
+                            allObjects.addAll(new AxiomAccumulator(descr, onts, min).getObjectsForDescription());
                         }
                     }
                 }
@@ -77,12 +78,12 @@ public class AxiomAccumulator {
         return allObjects;
     }
 
-    public Set<OWLObject> filterObjectsForProp(OWLObjectPropertyExpression prop){
+    public Set<OWLObject> filterObjectsForProp(OWLPropertyExpression prop){
         ensureCacheBuilt();
         return existentialPropMap.get(prop);
     }
 
-    public Set<OWLObjectPropertyExpression> getUsedProperties(){
+    public Set<OWLPropertyExpression> getUsedProperties(){
         ensureCacheBuilt();
         return existentialPropMap.keySet();
     }
@@ -105,14 +106,19 @@ public class AxiomAccumulator {
             this.ax = ax;
         }
 
-        protected void handleRestriction(OWLQuantifiedRestriction<OWLObjectPropertyExpression, OWLDescription> restriction) {
-            OWLObjectPropertyExpression property = restriction.getProperty();
+        protected void handleRestriction(OWLQuantifiedRestriction restriction) {
+            OWLPropertyExpression property = restriction.getProperty();
             Set<OWLObject> axioms = existentialPropMap.get(property);
             if (axioms == null){
                 axioms = new HashSet<OWLObject>();
                 existentialPropMap.put(property, axioms);
             }
             axioms.add(ax);
+        }
+
+
+        protected int getMinCardinality() {
+            return min;
         }
     }
 }

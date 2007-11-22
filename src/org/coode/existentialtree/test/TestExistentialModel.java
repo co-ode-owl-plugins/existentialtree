@@ -51,7 +51,7 @@ public class TestExistentialModel extends TestCase {
 
     public void testDirectChildren(){
         init();
-        OWLExistentialTreeModel model = new OWLExistentialTreeModel(mngr.getOntologies(), new BasicComparator());
+        OWLExistentialTreeModel model = new OWLExistentialTreeModel(mngr, mngr.getOntologies(), new BasicComparator());
         model.setRoot(getNamedClass("Pizza"));
         ExistentialNode root = model.getRoot();
         assertEquals(1, model.getChildCount(root));
@@ -66,7 +66,7 @@ public class TestExistentialModel extends TestCase {
 
     public void testInheritedChildren(){
         init();
-        OWLExistentialTreeModel model = new OWLExistentialTreeModel(mngr.getOntologies(), new BasicComparator());
+        OWLExistentialTreeModel model = new OWLExistentialTreeModel(mngr, mngr.getOntologies(), new BasicComparator());
         model.setRoot(getNamedClass("NamedPizza"));
         ExistentialNode root = model.getRoot();
         System.out.println("root.getChildren() = " + root.getChildren());
@@ -83,7 +83,7 @@ public class TestExistentialModel extends TestCase {
 
     public void testHandlingCycles(){
         init();
-        OWLExistentialTreeModel model = new OWLExistentialTreeModel(mngr.getOntologies(), new BasicComparator());
+        OWLExistentialTreeModel model = new OWLExistentialTreeModel(mngr, mngr.getOntologies(), new BasicComparator());
         model.setRoot(getNamedClass("Hot"));
         ExistentialNode root = model.getRoot();
         System.out.println("root.getChildren() = " + root.getChildren());
@@ -92,7 +92,7 @@ public class TestExistentialModel extends TestCase {
 
     public void testDefinedClassChildren(){
         init();
-        OWLExistentialTreeModel model = new OWLExistentialTreeModel(mngr.getOntologies(), new BasicComparator());
+        OWLExistentialTreeModel model = new OWLExistentialTreeModel(mngr, mngr.getOntologies(), new BasicComparator());
         model.setRoot(getNamedClass("CheeseyPizza"));
         ExistentialNode root = model.getRoot();
         assertEquals(2, model.getChildCount(root));

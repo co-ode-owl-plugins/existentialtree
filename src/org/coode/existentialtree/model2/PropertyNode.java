@@ -63,10 +63,10 @@ import java.util.*;
  * Each property node is therefore a collection:
  * Multiple objects that relate a single description or individual to multiple fillers or individuals
  */
-public class PropertyNode implements ExistentialNode<OWLObjectPropertyExpression> {
+public class PropertyNode implements ExistentialNode<OWLPropertyExpression> {
 
     private Set<OWLObject> objects = new HashSet<OWLObject>();
-    private OWLObjectPropertyExpression property;
+    private OWLPropertyExpression property;
     private OWLDescriptionNode parent;
     private Set<ExistentialNode> children = new HashSet<ExistentialNode>();
     private List<ExistentialNode> orderedChildren;
@@ -79,7 +79,7 @@ public class PropertyNode implements ExistentialNode<OWLObjectPropertyExpression
      * @param model
      */
     public PropertyNode(Set<OWLObject> objects, OWLDescriptionNode parent,
-                        OWLObjectPropertyExpression property,
+                        OWLPropertyExpression property,
                         OWLExistentialTreeModel model) {
 
         this.model = model;
@@ -96,7 +96,7 @@ public class PropertyNode implements ExistentialNode<OWLObjectPropertyExpression
         Collections.sort(orderedChildren, model.getComparator());
     }
 
-    public OWLObjectPropertyExpression getProperty(){
+    public OWLPropertyExpression getProperty(){
         return property;
     }
 
@@ -108,10 +108,13 @@ public class PropertyNode implements ExistentialNode<OWLObjectPropertyExpression
         return Collections.unmodifiableList(orderedChildren);
     }
 
-    public OWLObjectPropertyExpression getUserObject() {
+    public OWLPropertyExpression getUserObject() {
         return property;
     }
 
+    public OWLPropertyExpression getRenderedObject() {
+        return getUserObject();
+    }
 
     public String toString() {
         return getUserObject().toString();
@@ -124,14 +127,19 @@ public class PropertyNode implements ExistentialNode<OWLObjectPropertyExpression
             super(base, onts);
         }
 
-//        public void visit(OWLClass cls) {
-//            // overload as the appropriate inherited restrictions have already been passed in
-//        }
-
-        protected void handleRestriction(OWLQuantifiedRestriction<OWLObjectPropertyExpression, OWLDescription> restriction) {
+        protected void handleRestriction(OWLQuantifiedRestriction restriction) {
             if (restriction.getProperty().equals(property)){
-                children.add(new OWLDescriptionNode(restriction.getFiller(), model));
+                if (restriction.getFiller() instanceof OWLDescription){
+                    children.add(new OWLDescriptionNode((OWLDescription)restriction.getFiller(), model));
+                }
+                else{
+                    children.add(new OWLDataRangeNode((OWLDataRange)restriction.getFiller()));
+                }
             }
+        }
+
+        protected int getMinCardinality() {
+            return model.getMin();
         }
     }
 }

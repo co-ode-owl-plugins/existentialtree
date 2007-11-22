@@ -44,7 +44,7 @@ public class ExistentialTreeRenderer extends OWLCellRenderer {
     }
 
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-        value = ((ExistentialNode)value).getUserObject();
+        value = ((ExistentialNode)value).getRenderedObject();
         return super.getTreeCellRendererComponent(tree,
                                                   value,
                                                   selected,

@@ -10,7 +10,7 @@ Bundle-DocURL: http://www.co-ode.org
 Bundle-ClassPath: .
 Import-Package: org.osgi.framework,
  org.apache.log4j
-Bundle-Version: 1.0.1
+Bundle-Version: 1.0.2
 Bundle-Activator: org.protege.editor.core.plugin.DefaultPluginActivator
 Require-Bundle: org.eclipse.equinox.registry,
  org.eclipse.equinox.common,
