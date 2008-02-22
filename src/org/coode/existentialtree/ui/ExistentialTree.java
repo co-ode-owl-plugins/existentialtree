@@ -45,6 +45,7 @@ public class ExistentialTree extends JTree {
 
     public ExistentialTree(OWLExistentialTreeModel model, OWLEditorKit eKit) {
         super(model);
+        setRowHeight(-1); // forces the renderer to be asked for row height (needed for text-wrapped expressions)        
         setCellRenderer(new ExistentialTreeRenderer(eKit));
     }
 

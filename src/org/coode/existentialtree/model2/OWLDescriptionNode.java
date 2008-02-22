@@ -1,10 +1,7 @@
 package org.coode.existentialtree.model2;
 
 import org.coode.existentialtree.util.AxiomAccumulator;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.model.OWLPropertyExpression;
+import org.semanticweb.owl.model.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -57,12 +54,22 @@ public class OWLDescriptionNode implements ExistentialNode<OWLDescription> {
     }
 
     public OWLDescription getRenderedObject() {
+        OWLDescription renderedObject = descr; // default to rendering the object directly
         if (descr instanceof OWLClass){
-            return descr;
+
         }
-        else{
-            return model.getOWLThing();
+        else if (getChildren().size() > 0){ // if there are any children, we should be able to name the object
+            renderedObject =  model.getOWLThing(); // default to owl:Thing
+
+            // if we have an intersection containing a named class
+            if (descr instanceof OWLObjectIntersectionOf){
+                OWLClass root = getFirstNamedClassFromIntersection((OWLObjectIntersectionOf) descr);
+                if (root != null){
+                    renderedObject = root;
+                }
+            }
         }
+        return renderedObject;
     }
 
     public List<ExistentialNode> getChildren() {
@@ -96,5 +103,14 @@ public class OWLDescriptionNode implements ExistentialNode<OWLDescription> {
 
     public boolean equals(Object object) {
         return descr.equals(((OWLDescriptionNode)object).getUserObject());
+    }
+
+    private OWLClass getFirstNamedClassFromIntersection(OWLObjectIntersectionOf intersectionOf) {
+        for (OWLDescription op : intersectionOf.getOperands()){
+            if (op instanceof OWLClass){
+                return (OWLClass)op;
+            }
+        }
+        return null;
     }
 }
