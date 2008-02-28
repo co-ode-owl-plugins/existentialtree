@@ -2,8 +2,8 @@ package org.coode.existentialtree.test;
 
 import junit.framework.TestCase;
 import org.apache.commons.lang.StringUtils;
-import org.coode.existentialtree.model2.ExistentialNode;
-import org.coode.existentialtree.model2.OWLExistentialTreeModel;
+import org.coode.existentialtree.model2.OutlineNode;
+import org.coode.existentialtree.model2.OutlineTreeModel;
 import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.model.*;
 
@@ -51,88 +51,88 @@ public class TestExistentialModel extends TestCase {
 
     public void testDirectChildren(){
         init();
-        OWLExistentialTreeModel model = new OWLExistentialTreeModel(mngr, mngr.getOntologies(), new BasicComparator());
+        OutlineTreeModel model = new OutlineTreeModel(mngr, mngr.getOntologies(), new BasicComparator());
         model.setRoot(getNamedClass("Pizza"));
-        ExistentialNode root = model.getRoot();
+        OutlineNode root = model.getRoot();
         assertEquals(1, model.getChildCount(root));
 
-        ExistentialNode hasBase = model.getChild(root, 0);
+        OutlineNode hasBase = model.getChild(root, 0);
         assertEquals(getNamedProperty("hasBase"), hasBase.getUserObject());
 
         assertEquals(1, model.getChildCount(hasBase));
-        ExistentialNode pizzaBase = model.getChild(hasBase, 0);
+        OutlineNode pizzaBase = model.getChild(hasBase, 0);
         assertEquals(getNamedClass("PizzaBase"), pizzaBase.getUserObject());
     }
 
     public void testInheritedChildren(){
         init();
-        OWLExistentialTreeModel model = new OWLExistentialTreeModel(mngr, mngr.getOntologies(), new BasicComparator());
+        OutlineTreeModel model = new OutlineTreeModel(mngr, mngr.getOntologies(), new BasicComparator());
         model.setRoot(getNamedClass("NamedPizza"));
-        ExistentialNode root = model.getRoot();
+        OutlineNode root = model.getRoot();
         System.out.println("root.getChildren() = " + root.getChildren());
         assertEquals(1, model.getChildCount(root));
 
-        ExistentialNode hasBase = model.getChild(root, 0);
+        OutlineNode hasBase = model.getChild(root, 0);
         assertEquals(getNamedProperty("hasBase"), hasBase.getUserObject());
 
         System.out.println("hasBase.getChildren() = " + hasBase.getChildren());
         assertEquals(1, model.getChildCount(hasBase));
-        ExistentialNode pizzaBase = model.getChild(hasBase, 0);
+        OutlineNode pizzaBase = model.getChild(hasBase, 0);
         assertEquals(getNamedClass("PizzaBase"), pizzaBase.getUserObject());
     }
 
     public void testHandlingCycles(){
         init();
-        OWLExistentialTreeModel model = new OWLExistentialTreeModel(mngr, mngr.getOntologies(), new BasicComparator());
+        OutlineTreeModel model = new OutlineTreeModel(mngr, mngr.getOntologies(), new BasicComparator());
         model.setRoot(getNamedClass("Hot"));
-        ExistentialNode root = model.getRoot();
+        OutlineNode root = model.getRoot();
         System.out.println("root.getChildren() = " + root.getChildren());
         assertEquals(0, model.getChildCount(root));
     }
 
     public void testDefinedClassChildren(){
         init();
-        OWLExistentialTreeModel model = new OWLExistentialTreeModel(mngr, mngr.getOntologies(), new BasicComparator());
+        OutlineTreeModel model = new OutlineTreeModel(mngr, mngr.getOntologies(), new BasicComparator());
         model.setRoot(getNamedClass("CheeseyPizza"));
-        ExistentialNode root = model.getRoot();
+        OutlineNode root = model.getRoot();
         assertEquals(2, model.getChildCount(root));
 
-        ExistentialNode hasBase = null;
+        OutlineNode hasBase = null;
         for (int i=0; i<model.getChildCount(root); i++){
-        ExistentialNode child = model.getChild(root, i);
+        OutlineNode child = model.getChild(root, i);
             if (child.getUserObject().equals(getNamedProperty("hasBase"))){
                 hasBase = child;
             }
         }
         assertNotNull(hasBase);
         assertEquals(1, model.getChildCount(hasBase));
-        ExistentialNode pizzaBase = model.getChild(hasBase, 0);
+        OutlineNode pizzaBase = model.getChild(hasBase, 0);
         assertEquals(getNamedClass("PizzaBase"), pizzaBase.getUserObject());
 
-        ExistentialNode hasTopping = null;
+        OutlineNode hasTopping = null;
         for (int i=0; i<model.getChildCount(root); i++){
-        ExistentialNode child = model.getChild(root, i);
+        OutlineNode child = model.getChild(root, i);
             if (child.getUserObject().equals(getNamedProperty("hasTopping"))){
                 hasTopping = child;
             }
         }
         assertNotNull(hasTopping);
         assertEquals(1, model.getChildCount(hasTopping));
-        ExistentialNode cheeseTopping = model.getChild(hasTopping, 0);
+        OutlineNode cheeseTopping = model.getChild(hasTopping, 0);
         assertEquals(getNamedClass("CheeseTopping"), cheeseTopping.getUserObject());
     }
 
-    private ExistentialNode findNode(OWLExistentialTreeModel model, ExistentialNode start, OWLClass namedClass) {
+    private OutlineNode findNode(OutlineTreeModel model, OutlineNode start, OWLClass namedClass) {
         indent++;
         for (int i=0; i<model.getChildCount(start); i++){
-            ExistentialNode child = model.getChild(start, i);
+            OutlineNode child = model.getChild(start, i);
             System.out.println(StringUtils.leftPad("+ " + child, indent*2));
             OWLObject obj = child.getUserObject();
             if (obj.equals(namedClass)){
                 return child;
             }
             else if (!model.isLeaf(child)){
-                ExistentialNode node = findNode(model, child, namedClass);
+                OutlineNode node = findNode(model, child, namedClass);
                 if (node != null){
                     return node;
                 }

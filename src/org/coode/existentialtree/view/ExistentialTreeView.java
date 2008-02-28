@@ -40,6 +40,7 @@ public class ExistentialTreeView extends AbstractTreeView {
 
     private AbstractHierarchyProvider treeProvider;
 
+
     protected AbstractHierarchyProvider<OWLDescription> getHierarchyProvider() {
         if (treeProvider == null){
             treeProvider = new OWLExistentialHierarchyProvider(getOWLModelManager());

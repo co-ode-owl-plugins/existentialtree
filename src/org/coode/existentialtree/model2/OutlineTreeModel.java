@@ -1,9 +1,6 @@
 package org.coode.existentialtree.model2;
 
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.model.OWLPropertyExpression;
+import org.semanticweb.owl.model.*;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -44,10 +41,10 @@ import java.util.Set;
  * Bio Health Informatics Group<br>
  * Date: Oct 29, 2007<br><br>
  */
-public class OWLExistentialTreeModel implements TreeModel {
+public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
 
     private OWLDescriptionNode root;
-    private Comparator<ExistentialNode> comparator;
+    private Comparator<OutlineNode> comparator;
 
     private List<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
 
@@ -56,9 +53,9 @@ public class OWLExistentialTreeModel implements TreeModel {
     private OWLOntologyManager mngr;
     private int min = 1;
 
-    public OWLExistentialTreeModel(OWLOntologyManager mngr,
-                                   Set<OWLOntology> onts,
-                                   Comparator<ExistentialNode> comparator) {
+    public OutlineTreeModel(OWLOntologyManager mngr,
+                            Set<OWLOntology> onts,
+                            Comparator<OutlineNode> comparator) {
         this.mngr = mngr;
         this.onts = onts;
         this.comparator = comparator;
@@ -66,22 +63,22 @@ public class OWLExistentialTreeModel implements TreeModel {
 
     public void setRoot(OWLClass cls){
         OWLDescriptionNode oldRoot = root;
-        this.root = new OWLDescriptionNode(cls, this);
+        this.root = createNode(cls, null);
         for (TreeModelListener l : listeners){
             l.treeStructureChanged(new TreeModelEvent(this, new Object[]{oldRoot}));
         }
     }
 
-    public ExistentialNode getRoot() {
+    public OutlineNode getRoot() {
         return root;
     }
 
-    public ExistentialNode getChild(Object object, int i) {
-        return (ExistentialNode) ((ExistentialNode)object).getChildren().get(i);
+    public OutlineNode getChild(Object object, int i) {
+        return (OutlineNode) ((OutlineNode)object).getChildren().get(i);
     }
 
     public int getChildCount(Object object) {
-        return ((ExistentialNode)object).getChildren().size();
+        return ((OutlineNode)object).getChildren().size();
     }
 
     public boolean isLeaf(Object object) {
@@ -93,7 +90,7 @@ public class OWLExistentialTreeModel implements TreeModel {
     }
 
     public int getIndexOfChild(Object object, Object object1) {
-        return ((ExistentialNode)object).getChildren().indexOf(object1);
+        return ((OutlineNode)object).getChildren().indexOf(object1);
     }
 
     public void addTreeModelListener(TreeModelListener treeModelListener) {
@@ -108,7 +105,7 @@ public class OWLExistentialTreeModel implements TreeModel {
         return onts;
     }
 
-    public Comparator<ExistentialNode> getComparator() {
+    public Comparator<OutlineNode> getComparator() {
         return comparator;
     }
 
@@ -134,5 +131,49 @@ public class OWLExistentialTreeModel implements TreeModel {
     public void setMin(int m){
         min = m;
         setRoot((OWLClass)root.getUserObject()); // regenerate the root object
+    }
+
+    public <T extends OutlineNode> T createNode(OWLObject object, OutlineNode parent) {
+        T node;
+        if (object instanceof OWLConstant){
+            node = (T)new OWLConstantNode((OWLConstant)object);
+        }
+        else if (object instanceof OWLDataRange){
+            node = (T)new OWLDataRangeNode((OWLDataRange)object);
+        }
+        else if (object instanceof OWLPropertyExpression){
+            node = (T)new OWLPropertyNode((OWLPropertyExpression)object, this);
+        }
+        else if (object instanceof OWLIndividual){
+            node = (T)new OWLIndividualNode((OWLIndividual)object);
+        }
+        else {
+            node = (T)new OWLDescriptionNode((OWLDescription)object, this);
+        }
+        node.setParent(parent);
+        return node;
+    }
+
+    public void add(OutlineNode child, OutlineNode parent, OWLOntology ont) throws OWLOntologyChangeException {
+        List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+        if (parent instanceof OWLPropertyNode && child instanceof OWLDescriptionNode){
+            OWLDescription cls = ((OWLPropertyNode)parent).getParent().getUserObject();
+            OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)parent).getProperty();
+            OWLDescription filler = ((OWLDescriptionNode)child).getUserObject();
+            OWLDescription restr = mngr.getOWLDataFactory().getOWLObjectSomeRestriction(p, filler);
+            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLSubClassAxiom(cls, restr)));
+        }
+        else if (parent instanceof OWLDescriptionNode && child instanceof OWLPropertyNode){
+            // "adding a property to a class" = adding subClassOf(cls, someValuesFrom(p, owlThing))
+            OWLDescription cls = ((OWLDescriptionNode)parent).getUserObject();
+            OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)child).getProperty();
+            OWLDescription restr = mngr.getOWLDataFactory().getOWLObjectSomeRestriction(p, mngr.getOWLDataFactory().getOWLThing());
+            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLSubClassAxiom(cls, restr)));
+        }
+        mngr.applyChanges(changes);
+    }
+
+    public OWLOntologyManager getOWLOntologyManager() {
+        return mngr;
     }
 }

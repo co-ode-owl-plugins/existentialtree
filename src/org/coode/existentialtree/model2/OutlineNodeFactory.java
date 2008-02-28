@@ -1,8 +1,6 @@
 package org.coode.existentialtree.model2;
 
 import org.semanticweb.owl.model.OWLObject;
-
-import java.util.List;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -32,13 +30,15 @@ import java.util.List;
  * <p/>
  * The University Of Manchester<br>
  * Bio Health Informatics Group<br>
- * Date: Oct 29, 2007<br><br>
+ * Date: Feb 28, 2008<br><br>
  */
-public interface ExistentialNode<O extends OWLObject> {
+public interface OutlineNodeFactory {
 
-    public O getUserObject();
-
-    public O getRenderedObject();
-
-    public List<ExistentialNode> getChildren();
+    /**
+     *
+     * @param object
+     * @param parent optionally specify the parent node of the one created
+     * @return
+     */
+    <T extends OutlineNode> T createNode(OWLObject object, OutlineNode parent);
 }

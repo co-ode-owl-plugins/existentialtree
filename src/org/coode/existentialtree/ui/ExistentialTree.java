@@ -1,7 +1,7 @@
 package org.coode.existentialtree.ui;
 
-import org.coode.existentialtree.model2.ExistentialNode;
-import org.coode.existentialtree.model2.OWLExistentialTreeModel;
+import org.coode.existentialtree.model2.OutlineNode;
+import org.coode.existentialtree.model2.OutlineTreeModel;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
@@ -43,9 +43,10 @@ import java.awt.event.MouseEvent;
  */
 public class ExistentialTree extends JTree {
 
-    public ExistentialTree(OWLExistentialTreeModel model, OWLEditorKit eKit) {
+    public ExistentialTree(OutlineTreeModel model, OWLEditorKit eKit) {
         super(model);
-        setRowHeight(-1); // forces the renderer to be asked for row height (needed for text-wrapped expressions)        
+        setShowsRootHandles(true);
+        setRowHeight(-1); // forces the renderer to be asked for row height (needed for text-wrapped expressions)
         setCellRenderer(new ExistentialTreeRenderer(eKit));
     }
 
@@ -63,7 +64,7 @@ public class ExistentialTree extends JTree {
         if (path == null) {
             return null;
         }
-        ExistentialNode node = (ExistentialNode) path.getLastPathComponent();
+        OutlineNode node = (OutlineNode) path.getLastPathComponent();
         return node.getUserObject();
     }
 }

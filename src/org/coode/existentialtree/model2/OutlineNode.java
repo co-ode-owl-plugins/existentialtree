@@ -1,8 +1,8 @@
-package org.coode.existentialtree.test;
+package org.coode.existentialtree.model2;
 
-import org.coode.existentialtree.model2.OutlineNode;
+import org.semanticweb.owl.model.OWLObject;
 
-import java.util.Comparator;
+import java.util.List;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -32,14 +32,19 @@ import java.util.Comparator;
  * <p/>
  * The University Of Manchester<br>
  * Bio Health Informatics Group<br>
- * Date: Oct 30, 2007<br><br>
+ * Date: Oct 29, 2007<br><br>
  */
-public class BasicComparator implements Comparator<OutlineNode> {
+public interface OutlineNode<O extends OWLObject, P extends OutlineNode> {
 
-    public BasicComparator(){
-    }
+    O getUserObject();
 
-    public int compare(OutlineNode existentialNode, OutlineNode existentialNode1) {
-        return existentialNode.getUserObject().toString().compareTo(existentialNode1.getUserObject().toString());
-    }
+    O getRenderedObject();
+
+    List<OutlineNode> getChildren();
+
+    P getParent();
+
+    void setParent(P parent);
+
+    boolean isNavigable();
 }

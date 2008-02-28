@@ -81,11 +81,11 @@ public abstract class AbstractExistentialVisitorAdapter extends OWLObjectVisitor
     }
 
     public void visit(OWLObjectSomeRestriction restriction) {
-        handleRestriction(restriction);
+        handleQuantifiedRestriction(restriction);
     }
 
     public void visit(OWLDataSomeRestriction restriction) {
-        handleRestriction(restriction);
+        handleQuantifiedRestriction(restriction);
     }
 
     public void visit(OWLObjectMinCardinalityRestriction restriction) {
@@ -117,7 +117,7 @@ public abstract class AbstractExistentialVisitorAdapter extends OWLObjectVisitor
         if (!visitedObjects.contains(restriction)){
             visitedObjects.add(restriction);
             if (restriction.getCardinality() >= getMinCardinality()){
-                handleRestriction(restriction);
+                handleQuantifiedRestriction(restriction);
             }
         }
     }
@@ -126,5 +126,5 @@ public abstract class AbstractExistentialVisitorAdapter extends OWLObjectVisitor
         return 1;
     }
 
-    protected abstract void handleRestriction(OWLQuantifiedRestriction restriction);
+    protected abstract void handleQuantifiedRestriction(OWLQuantifiedRestriction restriction);
 }

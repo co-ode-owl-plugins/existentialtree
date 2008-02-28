@@ -1,8 +1,9 @@
 package org.coode.existentialtree.ui;
 
-import org.coode.existentialtree.model2.ExistentialNode;
+import org.coode.existentialtree.model2.OutlineNode;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
+import org.semanticweb.owl.model.OWLObject;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,16 +42,17 @@ public class ExistentialTreeRenderer extends OWLCellRenderer {
 
     public ExistentialTreeRenderer(OWLEditorKit owlEditorKit) {
         super(owlEditorKit);
+        setHighlightKeywords(true);
     }
 
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-        value = ((ExistentialNode)value).getRenderedObject();
+        OWLObject owlObject = ((OutlineNode) value).getRenderedObject();
         return super.getTreeCellRendererComponent(tree,
-                                                  value,
-                                                  selected,
-                                                  expanded,
-                                                  leaf,
-                                                  row,
-                                                  hasFocus);
+                owlObject,
+                selected,
+                expanded,
+                leaf,
+                row,
+                hasFocus);
     }
 }

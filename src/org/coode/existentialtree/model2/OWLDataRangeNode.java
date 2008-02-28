@@ -35,7 +35,7 @@ import java.util.List;
  * Bio Health Informatics Group<br>
  * Date: Nov 2, 2007<br><br>
  */
-public class OWLDataRangeNode implements ExistentialNode<OWLDataRange> {
+public class OWLDataRangeNode extends AbstractFillerNode<OWLDataRange> {
 
     private OWLDataRange range;
 
@@ -53,5 +53,18 @@ public class OWLDataRangeNode implements ExistentialNode<OWLDataRange> {
 
     public List getChildren() {
         return Collections.EMPTY_LIST;
+    }
+
+    public boolean isNavigable() {
+        return false;
+    }
+
+    public boolean equals(Object object) {
+        return object instanceof OWLDataRangeNode &&
+                range.equals(((OWLDataRangeNode)object).getUserObject());
+    }
+
+    protected void clear() {
+        // do nothing
     }
 }

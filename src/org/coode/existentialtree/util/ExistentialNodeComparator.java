@@ -1,6 +1,6 @@
 package org.coode.existentialtree.util;
 
-import org.coode.existentialtree.model2.ExistentialNode;
+import org.coode.existentialtree.model2.OutlineNode;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.OWLObjectComparator;
 
@@ -36,7 +36,7 @@ import java.util.Comparator;
  * Bio Health Informatics Group<br>
  * Date: Oct 29, 2007<br><br>
  */
-public class ExistentialNodeComparator implements Comparator<ExistentialNode> {
+public class ExistentialNodeComparator implements Comparator<OutlineNode> {
 
     private OWLObjectComparator owlComparator;
 
@@ -44,7 +44,7 @@ public class ExistentialNodeComparator implements Comparator<ExistentialNode> {
         owlComparator = new OWLObjectComparator(mngr);
     }
 
-    public int compare(ExistentialNode existentialNode, ExistentialNode existentialNode1) {
+    public int compare(OutlineNode existentialNode, OutlineNode existentialNode1) {
         return owlComparator.compare(existentialNode.getUserObject(), existentialNode1.getUserObject());
     }
 }

@@ -38,13 +38,13 @@ import java.util.Set;
  * Bio Health Informatics Group<br>
  * Date: Oct 29, 2007<br><br>
  */
-public class OWLDescriptionNode implements ExistentialNode<OWLDescription> {
+public class OWLDescriptionNode extends AbstractFillerNode<OWLDescription> {
 
     private OWLDescription descr;
-    private List<ExistentialNode> children;
-    private OWLExistentialTreeModel model;
+    private List<OutlineNode> children;
+    private OutlineTreeModel model;
 
-    public OWLDescriptionNode(OWLDescription descr, OWLExistentialTreeModel model){
+    public OWLDescriptionNode(OWLDescription descr, OutlineTreeModel model){
         this.descr = descr;
         this.model = model;
     }
@@ -72,29 +72,39 @@ public class OWLDescriptionNode implements ExistentialNode<OWLDescription> {
         return renderedObject;
     }
 
-    public List<ExistentialNode> getChildren() {
+    public List<OutlineNode> getChildren() {
         if (children == null){
-            children = new ArrayList<ExistentialNode>();
-            AxiomAccumulator acc = new AxiomAccumulator(descr, model.getOntologies(), model.getMin());
-            Set<OWLObject> objects = acc.getObjectsForDescription();
-            if (!objects.isEmpty()){
-                Set<OWLPropertyExpression> filterproperties = model.getProperties();
-                Set<OWLPropertyExpression> properties;
-                if (filterproperties == null){
-                    properties = acc.getUsedProperties();
-                }
-                else{
-                    properties = new HashSet<OWLPropertyExpression>(filterproperties);
-                }
-                for (OWLPropertyExpression prop : properties){
-                    Set<OWLObject> owlAxioms = acc.filterObjectsForProp(prop);
-                    if (owlAxioms != null){
-                        children.add(new PropertyNode(owlAxioms, this, prop, model));
-                    }
+            refresh();
+        }
+        return children;
+    }
+
+    private void refresh() {
+        children = new ArrayList<OutlineNode>();
+        AxiomAccumulator acc = new AxiomAccumulator(descr, model.getOntologies(), model.getMin());
+        Set<OWLObject> objects = acc.getObjectsForDescription();
+        if (!objects.isEmpty()){
+            Set<OWLPropertyExpression> filterproperties = model.getProperties();
+            Set<OWLPropertyExpression> properties;
+            if (filterproperties == null){
+                properties = acc.getUsedProperties();
+            }
+            else{
+                properties = new HashSet<OWLPropertyExpression>(filterproperties);
+            }
+            for (OWLPropertyExpression prop : properties){
+                Set<OWLObject> owlAxioms = acc.filterObjectsForProp(prop);
+                if (owlAxioms != null){
+                    final OWLPropertyNode child = model.createNode(prop, this);
+                    child.setParent(this);
+                    children.add(child);
                 }
             }
         }
-        return children;
+    }
+
+    public boolean isNavigable() {
+        return descr instanceof OWLClass;
     }
 
     public String toString() {
@@ -102,7 +112,8 @@ public class OWLDescriptionNode implements ExistentialNode<OWLDescription> {
     }
 
     public boolean equals(Object object) {
-        return descr.equals(((OWLDescriptionNode)object).getUserObject());
+        return object instanceof OWLDescriptionNode &&
+                descr.equals(((OWLDescriptionNode)object).getUserObject());
     }
 
     private OWLClass getFirstNamedClassFromIntersection(OWLObjectIntersectionOf intersectionOf) {
@@ -112,5 +123,9 @@ public class OWLDescriptionNode implements ExistentialNode<OWLDescription> {
             }
         }
         return null;
+    }
+
+    protected void clear() {
+        children = null;
     }
 }

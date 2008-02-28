@@ -68,33 +68,32 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLD
     };
 
     private DisposableAction selectPropertyAction = new DisposableAction("Select Property", OWLIcons.getIcon("property.object.png")){
-        public void dispose() {
-        }
-
         public void actionPerformed(ActionEvent actionEvent) {
-            OWLObjectProperty prop = new UIHelper(getOWLEditorKit()).pickOWLObjectProperty();
-            if (prop != null){
-                propertyLabel = getOWLModelManager().getOWLEntityRenderer().render(prop);
-                clearPropertyAction.setEnabled(true);
-                getHierarchyProvider().setProp(prop);
-                refresh();
-                updateHeader(getSelectedOWLClass());
-            }
+            handleSelectProperty();
+        }
+        public void dispose() {
         }
     };
 
     private DisposableAction clearPropertyAction = new DisposableAction("Clear Property", OWLIcons.getIcon("property.object.delete.png")){
+        public void actionPerformed(ActionEvent actionEvent) {
+            handleClearProperty();
+        }
         public void dispose() {
         }
+    };
 
+    private DisposableAction addNodeAction = new DisposableAction("Add Node", OWLIcons.getIcon("class.add.sub.png")){
+        public void dispose() {
+            handleAddNode();
+        }
         public void actionPerformed(ActionEvent actionEvent) {
-            propertyLabel = ALL_PROPERTIES;
-            getHierarchyProvider().setProp(null);
-            refresh();
-            updateHeader(getSelectedOWLClass());
-            setEnabled(false);
         }
     };
+
+    protected void handleAddNode() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 
     protected void performExtraInitialisation() throws Exception {
 
@@ -102,11 +101,21 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLD
 
         getOWLWorkspace().addHierarchyListener(hListener);
 
-        addAction(selectPropertyAction, "A", "A");
-        addAction(clearPropertyAction, "A", "B");
+//        addAction(addNodeAction, "A", "A");
+        addAction(selectPropertyAction, "B", "A");
+        addAction(clearPropertyAction, "B", "B");
 
         clearPropertyAction.setEnabled(false);
     }
+
+    public void disposeView() {
+        getOWLModelManager().removeOntologyChangeListener(ontListener);
+        getOWLWorkspace().removeHierarchyListener(hListener);
+        ontListener = null;
+        hListener = null;
+        super.disposeView();
+    }
+
 
     // overload to prevent selection changing as we click on classes in the hierarchy
     protected void transmitSelection() {
@@ -152,11 +161,22 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLD
         getView().setHeaderText(str);
     }
 
-    public void disposeView() {
-        getOWLModelManager().removeOntologyChangeListener(ontListener);
-        getOWLWorkspace().removeHierarchyListener(hListener);
-        ontListener = null;
-        hListener = null;
-        super.disposeView();
+    private void handleSelectProperty() {
+        OWLObjectProperty prop = new UIHelper(getOWLEditorKit()).pickOWLObjectProperty();
+        if (prop != null){
+            propertyLabel = getOWLModelManager().getOWLEntityRenderer().render(prop);
+            clearPropertyAction.setEnabled(true);
+            getHierarchyProvider().setProp(prop);
+            refresh();
+            updateHeader(getSelectedOWLClass());
+        }
+    }
+
+    private void handleClearProperty() {
+        propertyLabel = ALL_PROPERTIES;
+        getHierarchyProvider().setProp(null);
+        refresh();
+        updateHeader(getSelectedOWLClass());
+        setEnabled(false);
     }
 }

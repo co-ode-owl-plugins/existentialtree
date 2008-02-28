@@ -37,13 +37,13 @@ import java.util.Set;
  * Bio Health Informatics Group<br>
  * Date: Oct 29, 2007<br><br>
  *
- * Pull together all subclass and equivclass someValuesFrom axioms for this class including inherited ones.
+ * Pull together all subclass and equivclass restriction axioms for this class including inherited ones.
  */
 public class AxiomAccumulator {
 
     private Set<OWLObject> allObjects = new HashSet<OWLObject>();
 
-    private Map<OWLPropertyExpression, Set<OWLObject>> existentialPropMap =
+    private Map<OWLPropertyExpression, Set<OWLObject>> restrictionMap =
             new HashMap<OWLPropertyExpression, Set<OWLObject>>();
 
     private boolean getInherited = true;
@@ -80,12 +80,12 @@ public class AxiomAccumulator {
 
     public Set<OWLObject> filterObjectsForProp(OWLPropertyExpression prop){
         ensureCacheBuilt();
-        return existentialPropMap.get(prop);
+        return restrictionMap.get(prop);
     }
 
     public Set<OWLPropertyExpression> getUsedProperties(){
         ensureCacheBuilt();
-        return existentialPropMap.keySet();
+        return restrictionMap.keySet();
     }
 
     private void ensureCacheBuilt() {
@@ -101,24 +101,41 @@ public class AxiomAccumulator {
 
         private OWLObject ax;
 
+
         public OWLFillerHandler(OWLObject base, OWLObject ax, Set<OWLOntology> onts) {
             super(base, onts);
             this.ax = ax;
         }
 
-        protected void handleRestriction(OWLQuantifiedRestriction restriction) {
-            OWLPropertyExpression property = restriction.getProperty();
-            Set<OWLObject> axioms = existentialPropMap.get(property);
-            if (axioms == null){
-                axioms = new HashSet<OWLObject>();
-                existentialPropMap.put(property, axioms);
-            }
-            axioms.add(ax);
+
+        public void visit(OWLDataValueRestriction restriction) {
+            handleRestriction(restriction);
+        }
+
+
+        public void visit(OWLObjectValueRestriction restriction) {
+            handleRestriction(restriction);
+        }
+
+
+        protected void handleQuantifiedRestriction(OWLQuantifiedRestriction restriction) {
+            handleRestriction(restriction);
         }
 
 
         protected int getMinCardinality() {
             return min;
+        }
+
+
+        private void handleRestriction(OWLRestriction restriction) {
+            OWLPropertyExpression property = restriction.getProperty();
+            Set<OWLObject> axioms = restrictionMap.get(property);
+            if (axioms == null){
+                axioms = new HashSet<OWLObject>();
+                restrictionMap.put(property, axioms);
+            }
+            axioms.add(ax);
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.coode.existentialtree.model2;
 
 import org.coode.existentialtree.util.AbstractExistentialVisitorAdapter;
+import org.coode.existentialtree.util.AxiomAccumulator;
 import org.semanticweb.owl.model.*;
 
 import java.util.*;
@@ -63,49 +64,51 @@ import java.util.*;
  * Each property node is therefore a collection:
  * Multiple objects that relate a single description or individual to multiple fillers or individuals
  */
-public class PropertyNode implements ExistentialNode<OWLPropertyExpression> {
+public class OWLPropertyNode implements OutlineNode<OWLPropertyExpression, OWLDescriptionNode> {
 
-    private Set<OWLObject> objects = new HashSet<OWLObject>();
     private OWLPropertyExpression property;
     private OWLDescriptionNode parent;
-    private Set<ExistentialNode> children = new HashSet<ExistentialNode>();
-    private List<ExistentialNode> orderedChildren;
-    private OWLExistentialTreeModel model;
+    private Set<OutlineNode> children = new HashSet<OutlineNode>();
+    private List<OutlineNode> orderedChildren;
+    private OutlineTreeModel model;
+
+
+    public OWLPropertyNode(OWLPropertyExpression property,
+                           OutlineTreeModel model){
+        this.model = model;
+        this.property = property;
+    }
 
     /**
-     * @param objects
+     *
      * @param parent
-     * @param property
-     * @param model
      */
-    public PropertyNode(Set<OWLObject> objects, OWLDescriptionNode parent,
-                        OWLPropertyExpression property,
-                        OWLExistentialTreeModel model) {
-
-        this.model = model;
-        this.parent = parent;
-        this.property = property;
-
-        // @@TODO could be lazy about this??
-        ChildrenBuilder builder = new ChildrenBuilder(parent.getUserObject(), model.getOntologies());
-        for (OWLObject object : objects){
-            object.accept(builder);
+    public void setParent(OWLDescriptionNode parent){
+        if (parent != this.parent){
+            this.parent = parent;
+            orderedChildren = null;
         }
-        
-        orderedChildren = new ArrayList<ExistentialNode>(children);
-        Collections.sort(orderedChildren, model.getComparator());
     }
 
     public OWLPropertyExpression getProperty(){
         return property;
     }
 
-    public OWLDescriptionNode getParent(){
+
+    public OWLDescriptionNode getParent() {
         return parent;
     }
 
-    public List<ExistentialNode> getChildren(){
-        return Collections.unmodifiableList(orderedChildren);
+
+    public List<OutlineNode> getChildren(){
+        if (orderedChildren == null){
+            refresh();
+        }
+        return orderedChildren;
+    }
+
+    public boolean isNavigable() {
+        return false;
     }
 
     public OWLPropertyExpression getUserObject() {
@@ -119,24 +122,61 @@ public class PropertyNode implements ExistentialNode<OWLPropertyExpression> {
     public String toString() {
         return getUserObject().toString();
     }
-    
 
+    public boolean equals(Object object) {
+        return object instanceof OWLPropertyNode &&
+                property.equals(((OWLPropertyNode)object).getUserObject());
+    }
+
+    private void refresh() {
+        children.clear();
+        ChildrenBuilder builder = new ChildrenBuilder(parent.getUserObject(), model.getOntologies());
+
+        AxiomAccumulator acc = new AxiomAccumulator(parent.getUserObject(), model.getOntologies(), model.getMin());
+        for (OWLObject object : acc.filterObjectsForProp(property)){
+            object.accept(builder);
+        }
+
+        orderedChildren = new ArrayList<OutlineNode>(children);
+        Collections.sort(orderedChildren, model.getComparator());
+        orderedChildren = Collections.unmodifiableList(orderedChildren);
+    }
+
+    /**
+     * Deals with OWLDescriptions and OWLDataRange fillers
+     * Also follows value restrictions
+     * Filters out owlThing children
+     */
     class ChildrenBuilder extends AbstractExistentialVisitorAdapter {
 
         public ChildrenBuilder(OWLObject base, Set<OWLOntology> onts) {
             super(base, onts);
         }
 
-        protected void handleRestriction(OWLQuantifiedRestriction restriction) {
+
+        public void visit(OWLDataValueRestriction restriction) {
             if (restriction.getProperty().equals(property)){
-                if (restriction.getFiller() instanceof OWLDescription){
-                    children.add(new OWLDescriptionNode((OWLDescription)restriction.getFiller(), model));
-                }
-                else{
-                    children.add(new OWLDataRangeNode((OWLDataRange)restriction.getFiller()));
+                children.add(model.createNode(restriction.getValue(), OWLPropertyNode.this));
+            }
+        }
+
+
+        public void visit(OWLObjectValueRestriction restriction) {
+            if (restriction.getProperty().equals(property)){
+                children.add(model.createNode(restriction.getValue(), OWLPropertyNode.this));
+            }
+        }
+
+
+        protected void handleQuantifiedRestriction(OWLQuantifiedRestriction restriction) {
+            if (restriction.getProperty().equals(property)){
+                final OWLPropertyRange filler = restriction.getFiller();
+                if (!filler.equals(model.getOWLOntologyManager().getOWLDataFactory().getOWLThing())){
+                    children.add(model.createNode(filler, OWLPropertyNode.this));
                 }
             }
         }
+
 
         protected int getMinCardinality() {
             return model.getMin();
