@@ -1,15 +1,18 @@
-package org.coode.existentialtree.ui;
+package org.coode.outlinetree.ui;
 
-import org.coode.existentialtree.model2.OutlineNode;
-import org.coode.existentialtree.model2.OutlineTreeModel;
+import org.coode.outlinetree.model.OutlineNode;
+import org.coode.outlinetree.model.OutlineTreeModel;
 import org.protege.editor.owl.OWLEditorKit;
-import org.semanticweb.owl.model.OWLEntity;
+import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
+import org.protege.editor.owl.ui.renderer.OWLObjectRenderer;
+import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLObject;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.Set;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -41,30 +44,55 @@ import java.awt.event.MouseEvent;
  * Bio Health Informatics Group<br>
  * Date: Oct 29, 2007<br><br>
  */
-public class ExistentialTree extends JTree {
+public class OutlineTree extends JTree {
+    private OWLEditorKit eKit;
 
-    public ExistentialTree(OutlineTreeModel model, OWLEditorKit eKit) {
+    public OutlineTree(OutlineTreeModel model, OWLEditorKit eKit) {
         super(model);
+        this.eKit = eKit;
         setShowsRootHandles(true);
         setRowHeight(-1); // forces the renderer to be asked for row height (needed for text-wrapped expressions)
-        setCellRenderer(new ExistentialTreeRenderer(eKit));
+        setCellRenderer(new OutlineTreeRenderer(eKit));
     }
 
     public String getToolTipText(MouseEvent event) {
-        OWLObject obj = getOWLObjectAtMousePosition(event);
-        if (obj instanceof OWLEntity) {
-            return ((OWLEntity) obj).getURI().toString();
+        OutlineNode node = getNodeAtMousePosition(event);
+        String text = "";
+        if (node != null){
+
+            OWLObjectRenderer objRen = eKit.getOWLModelManager().getOWLObjectRenderer();
+            OWLEntityRenderer entRen = eKit.getOWLModelManager().getOWLEntityRenderer();
+
+            text += "<html><body>";
+            text += "<b><font size='12pt'>" + objRen.render(node.getRenderedObject(), entRen) + "</font></b><br>";
+
+        text += "<b>" + node.getClass().getSimpleName() + "</b><br>";
+        text += "<b>" + objRen.render(node.getUserObject(), entRen) + "</b><br>";
+
+        Set<OWLAxiom> axioms = node.getAxioms();
+        for (OWLAxiom ax : axioms){
+            text += objRen.render(ax, entRen) + "<br>";
         }
-        return null;
+        text += "</body></html>";
+//        OWLObject obj = getOWLObjectAtMousePosition(event);
+
+//        if (obj instanceof OWLEntity) {
+//            return ((OWLEntity) obj).getURI().toString();
+//        }
+        }
+        return text;
     }
 
     protected OWLObject getOWLObjectAtMousePosition(MouseEvent event){
+        return getNodeAtMousePosition(event).getUserObject();
+    }
+
+    protected OutlineNode getNodeAtMousePosition(MouseEvent event){
         Point pt = event.getPoint();
         TreePath path = getPathForLocation(pt.x, pt.y);
         if (path == null) {
             return null;
         }
-        OutlineNode node = (OutlineNode) path.getLastPathComponent();
-        return node.getUserObject();
+        return (OutlineNode) path.getLastPathComponent();
     }
 }

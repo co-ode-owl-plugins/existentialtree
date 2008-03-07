@@ -1,4 +1,4 @@
-package org.coode.existentialtree.util;
+package org.coode.outlinetree.util;
 
 import org.semanticweb.owl.model.*;
 import org.semanticweb.owl.util.OWLObjectVisitorAdapter;
@@ -35,31 +35,17 @@ import java.util.Set;
  * The University Of Manchester<br>
  * Bio Health Informatics Group<br>
  * Date: Oct 30, 2007<br><br>
+ *
+ * Visits all object and data restrictions of cardinality > 0 and calls handleQuantifiedRestriction().
+ * Also pulls them out of intersections and sub and equiv class axioms (including those inherited) 
  */
-public abstract class AbstractExistentialVisitorAdapter extends OWLObjectVisitorAdapter {
+public abstract class AbstractExistentialFinder extends OWLObjectVisitorAdapter {
 
-    private OWLObject base;
-    private Set<OWLOntology> onts;
     private Set<OWLObject> visitedObjects = new HashSet<OWLObject>();
 
-    public AbstractExistentialVisitorAdapter(OWLObject base, Set<OWLOntology> onts) {
-        this.base = base;
-        this.onts = onts;
+    public AbstractExistentialFinder(Set<OWLOntology> onts) {
     }
 
-    public void visit(OWLClass cls){
-        if (!visitedObjects.contains(cls)){
-            visitedObjects.add(cls); // prevent cycles
-            for (OWLOntology ont : onts){
-                for (OWLAxiom subcls : ont.getSubClassAxiomsForLHS(cls)){
-                    subcls.accept(this);
-                }
-                for (OWLAxiom equivAxiom : ont.getEquivalentClassesAxioms(cls)){
-                    equivAxiom.accept(this);
-                }
-            }
-        }
-    }
 
     public void visit(OWLSubClassAxiom owlSubClassAxiom) {
         if (!visitedObjects.contains(owlSubClassAxiom)){
@@ -73,9 +59,9 @@ public abstract class AbstractExistentialVisitorAdapter extends OWLObjectVisitor
             visitedObjects.add(owlEquivalentClassesAxiom); // prevent cycles
             Set<OWLDescription> equivs = owlEquivalentClassesAxiom.getDescriptions();
             for (OWLDescription equiv : equivs){
-                if (!equiv.equals(base)){
+//                if (!visitedObjects.contains(base)){
                     equiv.accept(this);
-                }
+//                }
             }
         }
     }
@@ -122,9 +108,9 @@ public abstract class AbstractExistentialVisitorAdapter extends OWLObjectVisitor
         }
     }
 
+    protected abstract void handleQuantifiedRestriction(OWLQuantifiedRestriction restriction);
+
     protected int getMinCardinality() {
         return 1;
     }
-
-    protected abstract void handleQuantifiedRestriction(OWLQuantifiedRestriction restriction);
 }

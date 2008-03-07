@@ -1,6 +1,6 @@
 package org.coode.existentialtree.test;
 
-import org.coode.existentialtree.model2.OutlineNode;
+import org.coode.outlinetree.model.OutlineNode;
 
 import java.util.Comparator;
 /*
@@ -40,6 +40,6 @@ public class BasicComparator implements Comparator<OutlineNode> {
     }
 
     public int compare(OutlineNode existentialNode, OutlineNode existentialNode1) {
-        return existentialNode.getUserObject().toString().compareTo(existentialNode1.getUserObject().toString());
+        return existentialNode1.getUserObject().toString().compareTo(existentialNode.getUserObject().toString());
     }
 }

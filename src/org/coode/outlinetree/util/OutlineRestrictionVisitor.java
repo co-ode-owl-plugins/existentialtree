@@ -1,9 +1,8 @@
-package org.coode.existentialtree.model2;
+package org.coode.outlinetree.util;
 
-import org.semanticweb.owl.model.OWLDataRange;
+import org.semanticweb.owl.model.*;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -28,43 +27,44 @@ import java.util.List;
 */
 
 /**
- * Author: Nick Drummond<br>
+ * Author: drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
  * <p/>
  * The University Of Manchester<br>
  * Bio Health Informatics Group<br>
- * Date: Nov 2, 2007<br><br>
+ * Date: Mar 5, 2008<br><br>
+ *
+ *
+ * on top of existentials and cardinality restrictions also accummulate value restrictions
  */
-public class OWLDataRangeNode extends AbstractFillerNode<OWLDataRange> {
+public abstract class OutlineRestrictionVisitor extends AbstractExistentialFinder {
 
-    private OWLDataRange range;
+    private int min;
 
-    public OWLDataRangeNode(OWLDataRange range) {
-        this.range = range;
+    public OutlineRestrictionVisitor(Set<OWLOntology> onts, int min) {
+        super(onts);
+        this.min = min;
     }
 
-    public OWLDataRange getUserObject() {
-        return range;
+
+    public void visit(OWLDataValueRestriction restriction) {
+        handleRestriction(restriction);
     }
 
-    public OWLDataRange getRenderedObject() {
-        return range;
+
+    public void visit(OWLObjectValueRestriction restriction) {
+        handleRestriction(restriction);
     }
 
-    public List getChildren() {
-        return Collections.EMPTY_LIST;
+
+    protected void handleQuantifiedRestriction(OWLQuantifiedRestriction restriction) {
+        handleRestriction(restriction);
     }
 
-    public boolean isNavigable() {
-        return false;
+
+    protected int getMinCardinality() {
+        return min;
     }
 
-    public boolean equals(Object object) {
-        return object instanceof OWLDataRangeNode &&
-                range.equals(((OWLDataRangeNode)object).getUserObject());
-    }
-
-    protected void clear() {
-        // do nothing
-    }
+    protected abstract void handleRestriction(OWLRestriction restriction);
 }

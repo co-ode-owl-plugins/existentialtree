@@ -1,7 +1,7 @@
-package org.coode.existentialtree.model2;
+package org.coode.outlinetree.model;
 
-import org.coode.existentialtree.util.AbstractExistentialVisitorAdapter;
-import org.coode.existentialtree.util.AxiomAccumulator;
+import org.coode.outlinetree.util.AbstractExistentialFinder;
+import org.coode.outlinetree.util.OutlineRestrictionVisitor;
 import org.semanticweb.owl.model.*;
 
 import java.util.*;
@@ -64,41 +64,20 @@ import java.util.*;
  * Each property node is therefore a collection:
  * Multiple objects that relate a single description or individual to multiple fillers or individuals
  */
-public class OWLPropertyNode implements OutlineNode<OWLPropertyExpression, OWLDescriptionNode> {
+class OWLPropertyNode extends AbstractOutlineNode<OWLPropertyExpression, OutlineNode<OWLDescription, OutlineNode>> {
 
     private OWLPropertyExpression property;
-    private OWLDescriptionNode parent;
-    private Set<OutlineNode> children = new HashSet<OutlineNode>();
     private List<OutlineNode> orderedChildren;
-    private OutlineTreeModel model;
+
+    private Set<OutlineNode> children = new HashSet<OutlineNode>();
+    private Set<OWLRestriction> restrs = new HashSet<OWLRestriction>();
 
 
     public OWLPropertyNode(OWLPropertyExpression property,
                            OutlineTreeModel model){
-        this.model = model;
+        super(model);
         this.property = property;
     }
-
-    /**
-     *
-     * @param parent
-     */
-    public void setParent(OWLDescriptionNode parent){
-        if (parent != this.parent){
-            this.parent = parent;
-            orderedChildren = null;
-        }
-    }
-
-    public OWLPropertyExpression getProperty(){
-        return property;
-    }
-
-
-    public OWLDescriptionNode getParent() {
-        return parent;
-    }
-
 
     public List<OutlineNode> getChildren(){
         if (orderedChildren == null){
@@ -108,7 +87,7 @@ public class OWLPropertyNode implements OutlineNode<OWLPropertyExpression, OWLDe
     }
 
     public boolean isNavigable() {
-        return false;
+        return true;
     }
 
     public OWLPropertyExpression getUserObject() {
@@ -116,7 +95,7 @@ public class OWLPropertyNode implements OutlineNode<OWLPropertyExpression, OWLDe
     }
 
     public OWLPropertyExpression getRenderedObject() {
-        return getUserObject();
+        return property;
     }
 
     public String toString() {
@@ -130,40 +109,93 @@ public class OWLPropertyNode implements OutlineNode<OWLPropertyExpression, OWLDe
 
     private void refresh() {
         children.clear();
-        ChildrenBuilder builder = new ChildrenBuilder(parent.getUserObject(), model.getOntologies());
 
-        AxiomAccumulator acc = new AxiomAccumulator(parent.getUserObject(), model.getOntologies(), model.getMin());
-        for (OWLObject object : acc.filterObjectsForProp(property)){
-            object.accept(builder);
+        ChildrenBuilder builder = new ChildrenBuilder(getModel().getOntologies());
+
+        for (OWLRestriction restriction : restrs){
+            restriction.accept(builder);
         }
 
         orderedChildren = new ArrayList<OutlineNode>(children);
-        Collections.sort(orderedChildren, model.getComparator());
+        Collections.sort(orderedChildren, getModel().getComparator());
         orderedChildren = Collections.unmodifiableList(orderedChildren);
     }
 
+    protected void clear() {
+        orderedChildren = null;
+    }
+
+    public void setRestrictions(Set<OWLRestriction> restrs) {
+        this.restrs = restrs;
+    }
+
+    // maps the restrictions back to the axioms that contain them
+    private Set<OWLAxiom> getAxiomsForRestriction(OWLRestriction restriction) {
+        if (getParent().getUserObject() instanceof OWLClass){ // potentially multiple axioms to try
+            Set<OWLAxiom> matchingAxioms = new HashSet<OWLAxiom>();
+            for (OWLAxiom ax : getAxioms()){
+                AxiomFinder v = new AxiomFinder(getModel().getOntologies(), getModel().getMin());
+                if (v.doesAxiomContainRestriction(ax, restriction)){
+                    matchingAxioms.add(ax);
+                }
+            }
+            return matchingAxioms;
+        }
+        else{
+            return getAxioms(); // always just pass the current axiom
+        }
+    }
+
     /**
-     * Deals with OWLDescriptions and OWLDataRange fillers
-     * Also follows value restrictions
+     * Used to map the restrictions back to the axioms that contain them
+     */
+    class AxiomFinder extends OutlineRestrictionVisitor {
+
+        private boolean result = false;
+        private OWLRestriction searchRestriction;
+
+        public AxiomFinder(Set<OWLOntology> onts, int min) {
+            super(onts, min);
+        }
+
+        public boolean doesAxiomContainRestriction(OWLAxiom ax, OWLRestriction restriction){
+            result = false;
+            searchRestriction = restriction;
+            ax.accept(this);
+            return result;
+        }
+
+        protected void handleRestriction(OWLRestriction restriction) {
+            if (searchRestriction.equals(restriction)){
+                result = true;
+            }
+        }
+    }
+
+    /**
      * Filters out owlThing children
      */
-    class ChildrenBuilder extends AbstractExistentialVisitorAdapter {
+    class ChildrenBuilder extends AbstractExistentialFinder {
 
-        public ChildrenBuilder(OWLObject base, Set<OWLOntology> onts) {
-            super(base, onts);
+        public ChildrenBuilder(Set<OWLOntology> onts) {
+            super(onts);
         }
 
 
         public void visit(OWLDataValueRestriction restriction) {
             if (restriction.getProperty().equals(property)){
-                children.add(model.createNode(restriction.getValue(), OWLPropertyNode.this));
+                OutlineNode child = getModel().createNode(restriction.getValue(), OWLPropertyNode.this);
+                child.addAxioms(getAxiomsForRestriction(restriction));
+                children.add(child);
             }
         }
 
 
         public void visit(OWLObjectValueRestriction restriction) {
             if (restriction.getProperty().equals(property)){
-                children.add(model.createNode(restriction.getValue(), OWLPropertyNode.this));
+                OutlineNode child = getModel().createNode(restriction.getValue(), OWLPropertyNode.this);
+                child.addAxioms(getAxiomsForRestriction(restriction));
+                children.add(child);
             }
         }
 
@@ -171,15 +203,17 @@ public class OWLPropertyNode implements OutlineNode<OWLPropertyExpression, OWLDe
         protected void handleQuantifiedRestriction(OWLQuantifiedRestriction restriction) {
             if (restriction.getProperty().equals(property)){
                 final OWLPropertyRange filler = restriction.getFiller();
-                if (!filler.equals(model.getOWLOntologyManager().getOWLDataFactory().getOWLThing())){
-                    children.add(model.createNode(filler, OWLPropertyNode.this));
+                if (!filler.equals(getModel().getOWLOntologyManager().getOWLDataFactory().getOWLThing())){
+                    OutlineNode child = getModel().createNode(filler, OWLPropertyNode.this);
+                    child.addAxioms(getAxiomsForRestriction(restriction));
+                    children.add(child);
                 }
             }
         }
 
 
         protected int getMinCardinality() {
-            return model.getMin();
+            return getModel().getMin();
         }
     }
 }

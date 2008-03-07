@@ -1,4 +1,4 @@
-package org.coode.existentialtree.util;
+package org.coode.outlinetree.util;
 
 import org.semanticweb.owl.model.*;
 import org.semanticweb.owl.util.OWLDescriptionVisitorAdapter;

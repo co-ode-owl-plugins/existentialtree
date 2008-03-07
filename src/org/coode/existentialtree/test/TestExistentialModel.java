@@ -2,8 +2,8 @@ package org.coode.existentialtree.test;
 
 import junit.framework.TestCase;
 import org.apache.commons.lang.StringUtils;
-import org.coode.existentialtree.model2.OutlineNode;
-import org.coode.existentialtree.model2.OutlineTreeModel;
+import org.coode.outlinetree.model.OutlineNode;
+import org.coode.outlinetree.model.OutlineTreeModel;
 import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.model.*;
 

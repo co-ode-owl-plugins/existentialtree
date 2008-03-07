@@ -1,8 +1,9 @@
-package org.coode.existentialtree.ui;
+package org.coode.outlinetree.ui;
 
-import org.coode.existentialtree.model2.OutlineNode;
+import org.coode.outlinetree.model.OutlineNode;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
+import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 
 import javax.swing.*;
@@ -38,15 +39,16 @@ import java.awt.*;
  * Bio Health Informatics Group<br>
  * Date: Oct 29, 2007<br><br>
  */
-public class ExistentialTreeRenderer extends OWLCellRenderer {
+public class OutlineTreeRenderer extends OWLCellRenderer {
 
-    public ExistentialTreeRenderer(OWLEditorKit owlEditorKit) {
+    public OutlineTreeRenderer(OWLEditorKit owlEditorKit) {
         super(owlEditorKit);
         setHighlightKeywords(true);
     }
 
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         OWLObject owlObject = ((OutlineNode) value).getRenderedObject();
+        setCommentedOut(!((OutlineNode) value).isEditable());
         return super.getTreeCellRendererComponent(tree,
                 owlObject,
                 selected,
@@ -54,5 +56,10 @@ public class ExistentialTreeRenderer extends OWLCellRenderer {
                 leaf,
                 row,
                 hasFocus);
+    }
+
+
+    protected Color getColor(OWLEntity entity, Color defaultColor) {
+        return super.getColor(entity, defaultColor);    //To change body of overridden methods use File | Settings | File Templates.
     }
 }

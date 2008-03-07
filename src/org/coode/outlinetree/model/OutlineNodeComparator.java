@@ -1,6 +1,9 @@
-package org.coode.existentialtree.model2;
+package org.coode.outlinetree.model;
 
-import org.semanticweb.owl.model.OWLObject;
+import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.ui.OWLObjectComparator;
+
+import java.util.Comparator;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -30,15 +33,17 @@ import org.semanticweb.owl.model.OWLObject;
  * <p/>
  * The University Of Manchester<br>
  * Bio Health Informatics Group<br>
- * Date: Feb 28, 2008<br><br>
+ * Date: Oct 29, 2007<br><br>
  */
-public interface OutlineNodeFactory {
+public class OutlineNodeComparator implements Comparator<OutlineNode> {
 
-    /**
-     *
-     * @param object
-     * @param parent optionally specify the parent node of the one created
-     * @return
-     */
-    <T extends OutlineNode> T createNode(OWLObject object, OutlineNode parent);
+    private OWLObjectComparator owlComparator;
+
+    public OutlineNodeComparator(OWLModelManager mngr){
+        owlComparator = new OWLObjectComparator(mngr);
+    }
+
+    public int compare(OutlineNode existentialNode, OutlineNode existentialNode1) {
+        return owlComparator.compare(existentialNode.getUserObject(), existentialNode1.getUserObject());
+    }
 }

@@ -1,4 +1,4 @@
-package org.coode.existentialtree.model2;
+package org.coode.outlinetree.model;
 
 import org.semanticweb.owl.model.OWLIndividual;
 
@@ -13,11 +13,12 @@ import java.util.List;
  * Bio Health Informatics Group<br>
  * Date: Nov 2, 2007<br><br>
  */
-public class OWLIndividualNode extends AbstractFillerNode<OWLIndividual> {
+class OWLIndividualNode extends AbstractOutlineNode<OWLIndividual, OWLPropertyNode> {
 
     private OWLIndividual individual;
 
-    public OWLIndividualNode(OWLIndividual individual) {
+    public OWLIndividualNode(OWLIndividual individual, OutlineTreeModel model) {
+        super(model);
         this.individual = individual;
     }
 

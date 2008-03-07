@@ -1,9 +1,10 @@
-package org.coode.existentialtree.model;
+package org.coode.outlinetree.model;
 
-import org.protege.editor.owl.model.hierarchy.AbstractOWLObjectHierarchyProvider;
+import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.model.OWLObjectProperty;
-import org.semanticweb.owl.model.OWLOntologyManager;
+
+import java.util.List;
+import java.util.Set;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -35,13 +36,25 @@ import org.semanticweb.owl.model.OWLOntologyManager;
  * Bio Health Informatics Group<br>
  * Date: Oct 29, 2007<br><br>
  */
-public abstract class AbstractHierarchyProvider<O extends OWLObject> extends AbstractOWLObjectHierarchyProvider<O> {
+public interface OutlineNode<O extends OWLObject, P extends OutlineNode> {
 
-    protected AbstractHierarchyProvider(OWLOntologyManager owlOntologyManager) {
-        super(owlOntologyManager);
-    }
+    O getUserObject();
 
-    public abstract void setRoot(O selectedClass);
+    OWLObject getRenderedObject();
 
-    public abstract void setProp(OWLObjectProperty prop);
+    List<OutlineNode> getChildren();
+
+    Set<OWLAxiom> getAxioms();
+
+    P getParent();
+
+    boolean isNavigable();
+
+    void setParent(P parent);
+
+    void addAxioms(Set<OWLAxiom> axioms);
+
+    void setEditable(boolean editable);
+
+    boolean isEditable();
 }

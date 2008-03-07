@@ -1,10 +1,9 @@
-package org.coode.existentialtree.util;
+package org.coode.outlinetree.model;
 
-import org.coode.existentialtree.model2.OutlineNode;
-import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.ui.OWLObjectComparator;
+import org.semanticweb.owl.model.OWLDataRange;
 
-import java.util.Comparator;
+import java.util.Collections;
+import java.util.List;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -34,17 +33,39 @@ import java.util.Comparator;
  * <p/>
  * The University Of Manchester<br>
  * Bio Health Informatics Group<br>
- * Date: Oct 29, 2007<br><br>
+ * Date: Nov 2, 2007<br><br>
  */
-public class ExistentialNodeComparator implements Comparator<OutlineNode> {
+class OWLDataRangeNode extends AbstractOutlineNode<OWLDataRange, OWLPropertyNode> {
 
-    private OWLObjectComparator owlComparator;
+    private OWLDataRange range;
 
-    public ExistentialNodeComparator(OWLModelManager mngr){
-        owlComparator = new OWLObjectComparator(mngr);
+    public OWLDataRangeNode(OWLDataRange range, OutlineTreeModel model) {
+        super(model);
+        this.range = range;
     }
 
-    public int compare(OutlineNode existentialNode, OutlineNode existentialNode1) {
-        return owlComparator.compare(existentialNode.getUserObject(), existentialNode1.getUserObject());
+    public OWLDataRange getUserObject() {
+        return range;
+    }
+
+    public OWLDataRange getRenderedObject() {
+        return range;
+    }
+
+    public List getChildren() {
+        return Collections.EMPTY_LIST;
+    }
+
+    public boolean isNavigable() {
+        return false;
+    }
+
+    public boolean equals(Object object) {
+        return object instanceof OWLDataRangeNode &&
+                range.equals(((OWLDataRangeNode)object).getUserObject());
+    }
+
+    protected void clear() {
+        // do nothing
     }
 }

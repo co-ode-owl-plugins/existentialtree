@@ -1,12 +1,12 @@
-package org.coode.existentialtree;
+package org.coode.existentialtree.ui;
 
+import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
-import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.ui.OWLEntityComparator;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
-import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owl.model.*;
 
 import javax.swing.*;

@@ -13,7 +13,7 @@
     <extension id="ExistentialTreeView2"
                point="org.protege.editor.core.application.ViewComponent">
         <label value="Outline Tree"/>
-        <class value="org.coode.existentialtree.view.OutlineView"/>
+        <class value="org.coode.outlinetree.ui.OutlineView"/>
         <headerColor value="@org.protege.classcolor"/>
         <category value="@org.protege.classcategory"/>
     </extension>

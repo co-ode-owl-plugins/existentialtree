@@ -1,4 +1,4 @@
-package org.coode.existentialtree.model2;
+package org.coode.outlinetree.model;
 
 import org.semanticweb.owl.model.OWLConstant;
 
@@ -13,11 +13,12 @@ import java.util.List;
  * Bio Health Informatics Group<br>
  * Date: Nov 2, 2007<br><br>
  */
-public class OWLConstantNode extends AbstractFillerNode<OWLConstant> {
+class OWLConstantNode extends AbstractOutlineNode<OWLConstant, OWLPropertyNode> {
 
     private OWLConstant constant;
 
-    public OWLConstantNode(OWLConstant constant) {
+    public OWLConstantNode(OWLConstant constant, OutlineTreeModel model) {
+        super(model);
         this.constant = constant;
     }
 

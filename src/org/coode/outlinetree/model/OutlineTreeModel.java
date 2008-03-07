@@ -1,4 +1,4 @@
-package org.coode.existentialtree.model2;
+package org.coode.outlinetree.model;
 
 import org.semanticweb.owl.model.*;
 
@@ -43,7 +43,7 @@ import java.util.Set;
  */
 public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
 
-    private OWLDescriptionNode root;
+    private OutlineNode<OWLClass, OutlineNode> root;
     private Comparator<OutlineNode> comparator;
 
     private List<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
@@ -62,7 +62,7 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
     }
 
     public void setRoot(OWLClass cls){
-        OWLDescriptionNode oldRoot = root;
+        OutlineNode oldRoot = root;
         this.root = createNode(cls, null);
         for (TreeModelListener l : listeners){
             l.treeStructureChanged(new TreeModelEvent(this, new Object[]{oldRoot}));
@@ -116,7 +116,7 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
         }
     }
 
-    public Set<OWLPropertyExpression> getProperties(){
+    public Set<OWLPropertyExpression> getFilterProperties(){
         return props;
     }
 
@@ -130,48 +130,51 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
 
     public void setMin(int m){
         min = m;
-        setRoot((OWLClass)root.getUserObject()); // regenerate the root object
+        setRoot(root.getUserObject()); // regenerate the root object
     }
 
     public <T extends OutlineNode> T createNode(OWLObject object, OutlineNode parent) {
         T node;
         if (object instanceof OWLConstant){
-            node = (T)new OWLConstantNode((OWLConstant)object);
+            node = (T)new OWLConstantNode((OWLConstant)object, this);
         }
         else if (object instanceof OWLDataRange){
-            node = (T)new OWLDataRangeNode((OWLDataRange)object);
+            node = (T)new OWLDataRangeNode((OWLDataRange)object, this);
         }
         else if (object instanceof OWLPropertyExpression){
             node = (T)new OWLPropertyNode((OWLPropertyExpression)object, this);
         }
         else if (object instanceof OWLIndividual){
-            node = (T)new OWLIndividualNode((OWLIndividual)object);
+            node = (T)new OWLIndividualNode((OWLIndividual)object, this);
+        }
+        else if (object instanceof OWLClass){
+            node = (T)new OWLClassNode((OWLClass)object, this);
         }
         else {
-            node = (T)new OWLDescriptionNode((OWLDescription)object, this);
+            node = (T)new OWLAnonymousClassNode((OWLDescription)object, this);
         }
         node.setParent(parent);
         return node;
     }
 
-    public void add(OutlineNode child, OutlineNode parent, OWLOntology ont) throws OWLOntologyChangeException {
-        List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
-        if (parent instanceof OWLPropertyNode && child instanceof OWLDescriptionNode){
-            OWLDescription cls = ((OWLPropertyNode)parent).getParent().getUserObject();
-            OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)parent).getProperty();
-            OWLDescription filler = ((OWLDescriptionNode)child).getUserObject();
-            OWLDescription restr = mngr.getOWLDataFactory().getOWLObjectSomeRestriction(p, filler);
-            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLSubClassAxiom(cls, restr)));
-        }
-        else if (parent instanceof OWLDescriptionNode && child instanceof OWLPropertyNode){
-            // "adding a property to a class" = adding subClassOf(cls, someValuesFrom(p, owlThing))
-            OWLDescription cls = ((OWLDescriptionNode)parent).getUserObject();
-            OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)child).getProperty();
-            OWLDescription restr = mngr.getOWLDataFactory().getOWLObjectSomeRestriction(p, mngr.getOWLDataFactory().getOWLThing());
-            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLSubClassAxiom(cls, restr)));
-        }
-        mngr.applyChanges(changes);
-    }
+//    public void add(OutlineNode child, OutlineNode parent, OWLOntology ont) throws OWLOntologyChangeException {
+//        List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+//        if (parent instanceof OWLPropertyNode && child instanceof OWLAnonymousClassNode){
+//            OWLDescription cls = ((OWLPropertyNode)parent).getParent().getUserObject();
+//            OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)parent).getProperty();
+//            OWLDescription filler = ((OWLAnonymousClassNode)child).getUserObject();
+//            OWLDescription restr = mngr.getOWLDataFactory().getOWLObjectSomeRestriction(p, filler);
+//            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLSubClassAxiom(cls, restr)));
+//        }
+//        else if (parent instanceof OWLAnonymousClassNode && child instanceof OWLPropertyNode){
+//            // "adding a property to a class" = adding subClassOf(cls, someValuesFrom(p, owlThing))
+//            OWLDescription cls = ((OWLAnonymousClassNode)parent).getUserObject();
+//            OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)child).getProperty();
+//            OWLDescription restr = mngr.getOWLDataFactory().getOWLObjectSomeRestriction(p, mngr.getOWLDataFactory().getOWLThing());
+//            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLSubClassAxiom(cls, restr)));
+//        }
+//        mngr.applyChanges(changes);
+//    }
 
     public OWLOntologyManager getOWLOntologyManager() {
         return mngr;
