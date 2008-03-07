@@ -135,17 +135,13 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
 
     public <T extends OutlineNode> T createNode(OWLObject object, OutlineNode parent) {
         T node;
-        if (object instanceof OWLConstant){
-            node = (T)new OWLConstantNode((OWLConstant)object, this);
-        }
-        else if (object instanceof OWLDataRange){
-            node = (T)new OWLDataRangeNode((OWLDataRange)object, this);
+        if (object instanceof OWLConstant ||
+            object instanceof OWLDataRange ||
+            object instanceof OWLIndividual){
+            node = (T)new OutlineLeafNode(object, this);
         }
         else if (object instanceof OWLPropertyExpression){
             node = (T)new OWLPropertyNode((OWLPropertyExpression)object, this);
-        }
-        else if (object instanceof OWLIndividual){
-            node = (T)new OWLIndividualNode((OWLIndividual)object, this);
         }
         else if (object instanceof OWLClass){
             node = (T)new OWLClassNode((OWLClass)object, this);

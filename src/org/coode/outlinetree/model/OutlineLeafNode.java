@@ -1,6 +1,6 @@
 package org.coode.outlinetree.model;
 
-import org.semanticweb.owl.model.OWLDataRange;
+import org.semanticweb.owl.model.OWLObject;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,28 +28,30 @@ import java.util.List;
 */
 
 /**
- * Author: Nick Drummond<br>
+ * Author: drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
  * <p/>
  * The University Of Manchester<br>
  * Bio Health Informatics Group<br>
- * Date: Nov 2, 2007<br><br>
+ * Date: Mar 7, 2008<br><br>
+ *
+ * A node for OWLConstant, OWLIndividual and OWLDataRange
  */
-class OWLDataRangeNode extends AbstractOutlineNode<OWLDataRange, OWLPropertyNode> {
+public class OutlineLeafNode<O extends OWLObject> extends AbstractOutlineNode<O, OWLPropertyNode> {
 
-    private OWLDataRange range;
+    private O obj;
 
-    public OWLDataRangeNode(OWLDataRange range, OutlineTreeModel model) {
+    public OutlineLeafNode(O obj, OutlineTreeModel model) {
         super(model);
-        this.range = range;
+        this.obj = obj;
     }
 
-    public OWLDataRange getUserObject() {
-        return range;
+    public O getUserObject() {
+        return obj;
     }
 
-    public OWLDataRange getRenderedObject() {
-        return range;
+    public O getRenderedObject() {
+        return obj;
     }
 
     public List getChildren() {
@@ -61,8 +63,8 @@ class OWLDataRangeNode extends AbstractOutlineNode<OWLDataRange, OWLPropertyNode
     }
 
     public boolean equals(Object object) {
-        return object instanceof OWLDataRangeNode &&
-                range.equals(((OWLDataRangeNode)object).getUserObject());
+        return object.getClass().equals(getClass()) &&
+                obj.equals(((OutlineLeafNode)object).getUserObject());
     }
 
     protected void clear() {

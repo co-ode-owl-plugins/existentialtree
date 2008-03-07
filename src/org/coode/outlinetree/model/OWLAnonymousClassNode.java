@@ -111,7 +111,6 @@ class OWLAnonymousClassNode extends AbstractOutlineNode<OWLDescription, OWLPrope
         // get any more global things we can say about the class at this node
         Set<OWLAxiom> globalAxioms = new HashSet<OWLAxiom>();
         for (OWLClass cls : finder.getClassesToInheritFrom()){
-            System.out.println("cls = " + cls);
             globalAxioms.addAll((SuperAndEquivAxiomFinder.getAxioms(cls, getModel().getOntologies(), true)));
         }
 
