@@ -63,6 +63,10 @@ abstract class AbstractOutlineNode<O extends OWLObject, P extends OutlineNode> i
         return model;
     }
 
+    protected final boolean isRootClass() {
+        return parent == null;
+    }
+
     /**
      * Called after the parent has been set to clear out any cached children
      */

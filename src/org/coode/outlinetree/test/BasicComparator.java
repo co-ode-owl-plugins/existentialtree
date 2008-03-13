@@ -1,10 +1,8 @@
-package org.coode.outlinetree.model;
+package org.coode.outlinetree.test;
 
-import org.semanticweb.owl.model.OWLAxiom;
-import org.semanticweb.owl.model.OWLObject;
+import org.coode.outlinetree.model.OutlineNode;
 
-import java.util.List;
-import java.util.Set;
+import java.util.Comparator;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -34,29 +32,14 @@ import java.util.Set;
  * <p/>
  * The University Of Manchester<br>
  * Bio Health Informatics Group<br>
- * Date: Oct 29, 2007<br><br>
+ * Date: Oct 30, 2007<br><br>
  */
-public interface OutlineNode<O extends OWLObject, P extends OutlineNode> {
+public class BasicComparator implements Comparator<OutlineNode> {
 
-    O getUserObject();
+    public BasicComparator(){
+    }
 
-    OWLObject getRenderedObject();
-
-    List<OutlineNode> getChildren();
-
-    Set<OWLAxiom> getAxioms();
-
-    P getParent();
-
-    boolean isNavigable();
-
-    void setParent(P parent);
-
-    void addAxioms(Set<OWLAxiom> axioms);
-
-    void setEditable(boolean editable);
-
-    boolean isEditable();
-
-    Class<? extends OWLObject> getTypeOfChild();
+    public int compare(OutlineNode existentialNode, OutlineNode existentialNode1) {
+        return existentialNode1.getUserObject().toString().compareTo(existentialNode.getUserObject().toString());
+    }
 }

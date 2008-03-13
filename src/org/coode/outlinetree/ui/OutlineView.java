@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -150,13 +151,14 @@ public class OutlineView extends AbstractOWLClassViewComponent {
         OWLModelManager mngr = getOWLModelManager();
         model = new OutlineTreeModel(mngr.getOWLOntologyManager(),
                 mngr.getActiveOntologies(),
+                mngr.getOWLClassHierarchyProvider(),
                 new OutlineNodeComparator(mngr));
 
         getOWLModelManager().addOntologyChangeListener(ontListener);
 
         getOWLWorkspace().addHierarchyListener(hListener);
 
-        addAction(addExistentialRestrictionAction, "A", "A");
+//        addAction(addExistentialRestrictionAction, "A", "A");
         addAction(filterPropertiesAction, "B", "A");
         addAction(clearFiltersAction, "B", "B");
         addAction(showMinZeroAction, "C", "A");
@@ -164,7 +166,7 @@ public class OutlineView extends AbstractOWLClassViewComponent {
 
         showMinZeroAction.setEnabled(model.getMin() != 0);
         hideMinZeroAction.setEnabled(model.getMin() == 0);
-        
+
         clearFiltersAction.setEnabled(false);
     }
 
@@ -214,11 +216,14 @@ public class OutlineView extends AbstractOWLClassViewComponent {
     }
 
     protected OWLClass updateView(OWLClass selectedClass) {
-        if (!ignoreUpdateView){
-            refresh();
-        }
-        ignoreUpdateView = false;
-        return selectedClass;
+//        if (isSynchronizing()){
+            if (!ignoreUpdateView){
+                refresh();
+            }
+            ignoreUpdateView = false;
+//        }
+        OutlineNode rootNode = model.getRoot();
+        return (rootNode == null) ? null : (OWLClass)rootNode.getUserObject();
     }
 
     protected void updateHeader(OWLObject object) {
@@ -250,60 +255,35 @@ public class OutlineView extends AbstractOWLClassViewComponent {
 
 
     private void handleAddNode() {
-//        String errMessage = null;
-//        final UIHelper uiHelper = new UIHelper(getOWLEditorKit());
-//        if (currentSelection != null){
-//            if (currentSelection instanceof OWLPropertyNode){
-//                OWLPropertyNode node = (OWLPropertyNode)currentSelection;
-//                OWLDescription descr = node.getParent().getUserObject();
-//                // for now, only add existentials to named classes
-//                if (descr instanceof OWLClass){
-//                    OWLPropertyExpression property = node.getProperty();
-//                    if (property instanceof OWLObjectProperty){
-//                        OWLClass filler = uiHelper.pickOWLClass();
-//                        if (filler != null){
-//                            OutlineNode newNode = model.createNode(filler, currentSelection);
-//                            try {
-//                                model.add(newNode, currentSelection, getOWLModelManager().getActiveOntology());
-//                            } catch (OWLOntologyChangeException e) {
-//                                errMessage = e.getMessage();
-//                            }
-//                        }
-//                    }
-//                }
-//                else{
-//                    errMessage = "Cannot currently add a node into an anonymous class";
-//                    // would need to create a new expression with the additional existential in
-//                }
-//            }
-//            else if (currentSelection instanceof OWLAnonymousClassNode){
-//                OWLAnonymousClassNode node = (OWLAnonymousClassNode)currentSelection;
-//                OWLDescription descr = node.getUserObject();
-//                if (descr instanceof OWLClass){
-//                    OWLPropertyExpression property = pickProperty();
-//                    if (property != null){
-//                        OutlineNode newNode = model.createNode(property, currentSelection);
-//                        try {
-//                            model.add(newNode, currentSelection, getOWLModelManager().getActiveOntology());
-//                        } catch (OWLOntologyChangeException e) {
-//                            errMessage = e.getMessage();
-//                        }
-//                    }
-//                }
-//                else{
-//                    errMessage = "Cannot currently add a node into an anonymous class";
-//                    // would need to create a new expression with the additional existential in
-//                }
-//
-//            }
-//        }
-//        else{
-//            errMessage = "Please select a property or class in the tree first";
-//        }
-//
-//        if (errMessage != null){
-//            uiHelper.showDialog(errMessage, null);
-//        }
+        String errMessage = null;
+        if (currentSelection != null && currentSelection.isEditable()){
+            OWLObject value = getValue(currentSelection.getTypeOfChild());
+
+            if (value != null){
+                OutlineNode newNode = model.createNode(value, currentSelection);
+                List<OWLOntologyChange> changes = model.add(newNode, currentSelection, getOWLModelManager().getActiveOntology());
+                if (!changes.isEmpty()){
+                    getOWLModelManager().applyChanges(changes);
+                }
+            }
+        }
+        else{
+            errMessage = "Please select a property or class in the tree first";
+        }
+
+        if (errMessage != null){
+            new UIHelper(getOWLEditorKit()).showDialog(errMessage, null);
+        }
+    }
+
+    private <T extends OWLObject> T getValue(Class<T> typeOfChild) {
+        if (typeOfChild.equals(OWLClass.class)){
+            return (T)new UIHelper(getOWLEditorKit()).pickOWLClass();
+        }
+        else if (typeOfChild.equals(OWLProperty.class)){
+            return (T)new UIHelper(getOWLEditorKit()).pickOWLObjectProperty(); //@@TODO also data properties
+        }
+        return null;
     }
 
     private OWLPropertyExpression pickProperty() {
@@ -322,28 +302,36 @@ public class OutlineView extends AbstractOWLClassViewComponent {
     }
 
     private void handleFilterProperties() {
+        Set<OWLProperty> props = getFilterProperties();
+        if (!props.isEmpty()){
+            propertyLabel = "";
+            Set<OWLPropertyExpression> activeProperties = new HashSet<OWLPropertyExpression>();
+            for (OWLProperty p : props){
+                propertyLabel += getOWLModelManager().getOWLEntityRenderer().render(p) + ", ";
+                activeProperties.addAll(generateAllDescendants(p));
+            }
+            clearFiltersAction.setEnabled(true);
+            model.setProperties(activeProperties);
+            refresh();
+            updateHeader(getSelectedOWLClass());
+            // change clearProp
+        }
+    }
+
+    private Set<OWLProperty> getFilterProperties() {
+        Set<OWLProperty> props = new HashSet<OWLProperty>();
         if (objPropSel == null){
             objPropSel = new OWLObjectPropertySelectorPanel(getOWLEditorKit());
             dataPropSel = new OWLDataPropertySelectorPanel(getOWLEditorKit());
         }
+
         JSplitPane splitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, objPropSel, dataPropSel);
+
         if (new UIHelper(getOWLEditorKit()).showDialog("Select filter properties", splitter) == JOptionPane.OK_OPTION){
-            Set<OWLProperty> props = new HashSet<OWLProperty>(objPropSel.getSelectedOWLObjectProperties());
+            props.addAll(objPropSel.getSelectedOWLObjectProperties());
             props.addAll(dataPropSel.getSelectedOWLDataProperties());
-            if (!props.isEmpty()){
-                propertyLabel = "";
-                Set<OWLPropertyExpression> activeProperties = new HashSet<OWLPropertyExpression>();
-                for (OWLProperty p : props){
-                    propertyLabel += getOWLModelManager().getOWLEntityRenderer().render(p) + ", ";
-                    activeProperties.addAll(generateAllDescendants(p));
-                }
-                clearFiltersAction.setEnabled(true);
-                model.setProperties(activeProperties);
-                refresh();
-                updateHeader(getSelectedOWLClass());
-                // change clearProp
-            }
         }
+        return props;
     }
 
     private void handleClearProperty() {

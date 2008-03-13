@@ -1,8 +1,8 @@
 package org.coode.outlinetree.util;
 
+import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLOntology;
 
 import java.util.HashSet;
@@ -39,28 +39,35 @@ import java.util.Set;
  * Date: Oct 29, 2007<br><br>
  *
  */
-public class SuperAndEquivAxiomFinder {
+public class SuperAndEquivAxiomUtils {
 
     /**
      * Pull together all subclass and equivclass restriction axioms for this class including inherited ones.
      * @param cls
-     * @param inherited
-     * @param onts
+     * @param onts must match the ontologies loaded into the hp if given
+     * @param hp a hierarchy provider used to determine the superclasses to collect inherited axioms (if null, no inheritance)
      * @return
      */
-    public static Set<OWLAxiom> getAxioms(OWLClass cls, Set<OWLOntology> onts, boolean inherited){
-            Set<OWLAxiom>allObjects = new HashSet<OWLAxiom>();
-            for (OWLOntology ont : onts){
-                allObjects.addAll(ont.getSubClassAxiomsForLHS(cls));
-                allObjects.addAll(ont.getEquivalentClassesAxioms(cls));
-                if (inherited){
-                    for (OWLDescription descr : cls.getSuperClasses(ont)){
-                        if (descr instanceof OWLClass){
-                            allObjects.addAll(getAxioms((OWLClass)descr, onts, inherited));
-                        }
-                    }
+    public static Set<OWLAxiom> getAxioms(OWLClass cls, Set<OWLOntology> onts, OWLObjectHierarchyProvider<OWLClass> hp){
+        Set<OWLAxiom>allObjects = new HashSet<OWLAxiom>();
+        for (OWLOntology ont : onts){
+            allObjects.addAll(ont.getSubClassAxiomsForLHS(cls));
+            allObjects.addAll(ont.getEquivalentClassesAxioms(cls));
+            if (hp != null){
+                for (OWLClass parent : hp.getAncestors(cls)){
+                    allObjects.addAll(getAxioms(parent, onts, null));
                 }
             }
+        }
         return allObjects;
     }
+
+//    public static Set<OWLAxiom> filterAxiomsByRHS(Set<OWLAxiom> axioms){
+//        Set<OWLAxiom> filtered = new HashSet<OWLAxiom>(axioms);
+//        for (OWLAxiom ax : axioms){
+//            if (ax instanceof OWLSubClassAxiom){
+//                ax.get
+//            }
+//        }
+//    }
 }

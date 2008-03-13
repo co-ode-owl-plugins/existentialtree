@@ -1,5 +1,6 @@
 package org.coode.outlinetree.model;
 
+import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
 import org.semanticweb.owl.model.*;
 
 import javax.swing.event.TreeModelEvent;
@@ -48,16 +49,27 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
 
     private List<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
 
+    private OWLObjectHierarchyProvider<OWLClass> subsumptionHierarchyProvider;
+
     private Set<OWLPropertyExpression> props;
     private Set<OWLOntology> onts;
     private OWLOntologyManager mngr;
     private int min = 1;
 
+    /**
+     *
+     * @param mngr
+     * @param onts
+     * @param subsumptionHierarchyProvider used for inheritance of restrictions
+     * @param comparator
+     */
     public OutlineTreeModel(OWLOntologyManager mngr,
                             Set<OWLOntology> onts,
+                            OWLObjectHierarchyProvider<OWLClass> subsumptionHierarchyProvider,
                             Comparator<OutlineNode> comparator) {
         this.mngr = mngr;
         this.onts = onts;
+        this.subsumptionHierarchyProvider = subsumptionHierarchyProvider;
         this.comparator = comparator;
     }
 
@@ -147,32 +159,71 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
             node = (T)new OWLClassNode((OWLClass)object, this);
         }
         else {
-            node = (T)new OWLAnonymousClassNode((OWLDescription)object, this);
+            node = (T)new OWLDescriptionNode((OWLDescription)object, this);
         }
         node.setParent(parent);
         return node;
     }
 
-//    public void add(OutlineNode child, OutlineNode parent, OWLOntology ont) throws OWLOntologyChangeException {
-//        List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
-//        if (parent instanceof OWLPropertyNode && child instanceof OWLAnonymousClassNode){
-//            OWLDescription cls = ((OWLPropertyNode)parent).getParent().getUserObject();
-//            OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)parent).getProperty();
-//            OWLDescription filler = ((OWLAnonymousClassNode)child).getUserObject();
-//            OWLDescription restr = mngr.getOWLDataFactory().getOWLObjectSomeRestriction(p, filler);
-//            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLSubClassAxiom(cls, restr)));
-//        }
-//        else if (parent instanceof OWLAnonymousClassNode && child instanceof OWLPropertyNode){
-//            // "adding a property to a class" = adding subClassOf(cls, someValuesFrom(p, owlThing))
-//            OWLDescription cls = ((OWLAnonymousClassNode)parent).getUserObject();
-//            OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)child).getProperty();
-//            OWLDescription restr = mngr.getOWLDataFactory().getOWLObjectSomeRestriction(p, mngr.getOWLDataFactory().getOWLThing());
-//            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLSubClassAxiom(cls, restr)));
-//        }
-//        mngr.applyChanges(changes);
-//    }
+    public List<OWLOntologyChange> add(OutlineNode child, OutlineNode parent, OWLOntology ont) {
+        List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+        if (parent instanceof OWLPropertyNode && child instanceof OWLClassNode){
+            OWLDescription cls = ((OWLPropertyNode)parent).getParent().getUserObject();
+            OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)parent).getUserObject();
+            OWLDescription filler = ((OWLClassNode)child).getUserObject();
+            OWLDescription restr = mngr.getOWLDataFactory().getOWLObjectSomeRestriction(p, filler);
+            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLSubClassAxiom(cls, restr)));
+        }
+        else if (parent instanceof OWLClassNode && child instanceof OWLPropertyNode){
+            // "adding a property to a class" = adding subClassOf(cls, someValuesFrom(p, owlThing))
+            OWLDescription cls = ((OWLClassNode)parent).getUserObject();
+            OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)child).getUserObject();
+            OWLDescription restr = mngr.getOWLDataFactory().getOWLObjectSomeRestriction(p, mngr.getOWLDataFactory().getOWLThing());
+            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLSubClassAxiom(cls, restr)));
+        }
+        return changes;
+    }
+
+    /**
+     * As we carry a list of axioms for each node, we can work out which to remove/alter.
+     * @param node
+     * @return
+     * @throws OWLOntologyChangeException
+     */
+    public List<OWLOntologyChange> delete(OutlineNode node) throws OWLOntologyChangeException {
+        List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+        final Set<OWLAxiom> axioms = node.getAxioms(); // god knows why intelliJ is getting the generics f***d up on this
+        for (OWLAxiom ax : axioms){
+            //@@TODO below will only remove the whole path for the current node - need to handle truncating arbitrary descriptions
+//            if (isSubjectOfAxiom(getRoot().getUserObject(), ax)){
+//                for (OWLOntology ont : onts){
+//                    if (ont.containsAxiom(ax)){
+//                        changes.add(new RemoveAxiom(ont, ax));
+//                    }
+//                }
+//            }
+        }
+        return changes;
+    }
+
 
     public OWLOntologyManager getOWLOntologyManager() {
         return mngr;
+    }
+
+
+    public OWLObjectHierarchyProvider<OWLClass> getClassHierarchyProvider() {
+        return subsumptionHierarchyProvider;
+    }
+
+
+    private boolean isSubjectOfAxiom(OWLObject owlObject, OWLAxiom ax) {
+        if (ax instanceof OWLSubClassAxiom){
+            return ((OWLSubClassAxiom)ax).getSubClass().equals(owlObject);
+        }
+        else if (ax instanceof OWLEquivalentClassesAxiom){
+            return ((OWLEquivalentClassesAxiom)ax).getDescriptions().contains(owlObject);
+        }
+        return false;
     }
 }

@@ -1,7 +1,7 @@
 package org.coode.outlinetree.model;
 
 import org.coode.outlinetree.util.OutlinePropertyIndexer;
-import org.coode.outlinetree.util.SuperAndEquivAxiomFinder;
+import org.coode.outlinetree.util.SuperAndEquivAxiomUtils;
 import org.semanticweb.owl.model.*;
 
 import java.util.ArrayList;
@@ -41,26 +41,23 @@ import java.util.Set;
  *
  * Node for anonymous class expressions
  */
-class OWLAnonymousClassNode extends AbstractOutlineNode<OWLDescription, OWLPropertyNode> {
+class OWLDescriptionNode<O extends OWLDescription> extends AbstractOutlineNode<O, OWLPropertyNode> {
 
-    private OWLDescription descr;
+    private O descr;
     private List<OutlineNode> children;
 
-    public OWLAnonymousClassNode(OWLDescription descr, OutlineTreeModel model){
+    public OWLDescriptionNode(O descr, OutlineTreeModel model){
         super(model);
         this.descr = descr;
     }
 
-    public OWLDescription getUserObject() {
+    public O getUserObject() {
         return descr;
     }
 
     public OWLDescription getRenderedObject() {
         OWLDescription renderedObject = descr; // default to rendering the object directly
-        if (descr instanceof OWLClass){
-
-        }
-        else if (getChildren().size() > 0){ // if there are any children, we should be able to name the object
+        if (descr.isAnonymous() && getChildren().size() > 0){ // if there are any children, we should be able to name the object
             renderedObject =  getModel().getOWLThing(); // default to owl:Thing
 
             // if we have an intersection containing a single named class, show that
@@ -74,68 +71,88 @@ class OWLAnonymousClassNode extends AbstractOutlineNode<OWLDescription, OWLPrope
         return renderedObject;
     }
 
+    protected void clear() {
+        children = null;
+    }
+
     public List<OutlineNode> getChildren() {
         if (children == null){
+            children = new ArrayList<OutlineNode>();
             refresh();
         }
         return children;
     }
 
-    private void refresh() {
-        children = new ArrayList<OutlineNode>();
+    protected void refresh() {
         OutlineTreeModel model = getModel();
 
-        // below just used to find the properties used
         OutlinePropertyIndexer finder = new OutlinePropertyIndexer(model.getOntologies(), model.getMin());
         descr.accept(finder);
+
+        if (descr.isAnonymous()){
+            // children "inlined" in the description
+            createChildren(finder, isEditable()); // children of uneditable nodes are not editable
+            for (OutlineNode child : children){
+                child.addAxioms(getAxioms()); // always inherit the same axioms as this anon parent
+            }
+        }
+
+        // children from eg named classes in an intersection
+        createChildrenFromInheritedAxioms(finder);
+    }
+
+    // for each of the "properties on the class/description" create a child node
+    protected void createChildren(OutlinePropertyIndexer finder, boolean editable) {
+        for (OWLPropertyExpression prop : getFilteredProperties(finder)){
+            final OWLPropertyNode child = getModel().createNode(prop, this);
+            final Set<OWLAxiom> childAxioms = finder.getAxioms(prop);
+            if (childAxioms != null){
+                child.addAxioms(childAxioms);
+            }
+            child.setRestrictions(finder.getRestrictions(prop));
+            child.setEditable(editable);
+            children.add(child);
+        }
+    }
+
+    /**
+     *
+     * @param finder
+     * @return the intersection of the "used properties and those in current filter
+     */
+    protected Set<OWLPropertyExpression> getFilteredProperties(OutlinePropertyIndexer finder){
+        OutlineTreeModel model = getModel();
+
+        Set<OWLPropertyExpression> filterproperties = model.getFilterProperties();
         Set<OWLPropertyExpression> properties = finder.getProperties();
 
-        // check for property filter and only follow those properties
-        Set<OWLPropertyExpression> filterproperties = model.getFilterProperties();
         if (filterproperties != null){
             properties.retainAll(filterproperties);
         }
+        return properties;
+    }
 
-        // now find the subset of the axioms in this description that are pertinent to the property child nodes
-
-        // for each of the "properties on the class/description" create a child node
-        for (OWLPropertyExpression prop : properties){
-            final OWLPropertyNode child = model.createNode(prop, this);
-            child.addAxioms(getAxioms()); // all children of this node now only have the same axiom(s)
-            child.setRestrictions(finder.getRestrictions(prop));
-            children.add(child);
-        }
-
-        // @@TODO get rid of repetition
-
+    private void createChildrenFromInheritedAxioms(OutlinePropertyIndexer finder) {
         // get any more global things we can say about the class at this node
         Set<OWLAxiom> globalAxioms = new HashSet<OWLAxiom>();
         for (OWLClass cls : finder.getClassesToInheritFrom()){
-            globalAxioms.addAll((SuperAndEquivAxiomFinder.getAxioms(cls, getModel().getOntologies(), true)));
+            globalAxioms.addAll(getSuperAndEquivs(cls));
         }
 
-        finder.clear();        
+        finder.clear();
         for (OWLAxiom ax : globalAxioms){
             ax.accept(finder);
         }
-        properties = finder.getProperties();
 
-        if (filterproperties != null){
-            properties.retainAll(filterproperties);
-        }
-        // for each of the "properties on the class/description" create an uneditable child node
-        for (OWLPropertyExpression prop : properties){
-            final OWLPropertyNode child = model.createNode(prop, this);
-            child.setEditable(false);
-            child.addAxioms(finder.getAxioms(prop));
-            child.setRestrictions(finder.getRestrictions(prop));
-            children.add(child);
-        }
-
+        createChildren(finder, isRootClass());
     }
 
     public boolean isNavigable() {
-        return descr instanceof OWLClass;
+        return !descr.isAnonymous();
+    }
+
+    public Class<? extends OWLObject> getTypeOfChild() {
+        return OWLProperty.class;
     }
 
     public String toString() {
@@ -143,8 +160,8 @@ class OWLAnonymousClassNode extends AbstractOutlineNode<OWLDescription, OWLPrope
     }
 
     public boolean equals(Object object) {
-        return object instanceof OWLAnonymousClassNode &&
-                descr.equals(((OWLAnonymousClassNode)object).getUserObject());
+        return object instanceof OWLDescriptionNode &&
+                descr.equals(((OWLDescriptionNode)object).getUserObject());
     }
 
     private Set<OWLClass> getNamedClassesFromIntersection(OWLObjectIntersectionOf intersectionOf) {
@@ -160,7 +177,9 @@ class OWLAnonymousClassNode extends AbstractOutlineNode<OWLDescription, OWLPrope
         return namedClasses;
     }
 
-    protected void clear() {
-        children = null;
+    private Set<OWLAxiom> getSuperAndEquivs(OWLClass cls) {
+        return SuperAndEquivAxiomUtils.getAxioms(cls,
+                getModel().getOntologies(),
+                getModel().getClassHierarchyProvider());
     }
 }

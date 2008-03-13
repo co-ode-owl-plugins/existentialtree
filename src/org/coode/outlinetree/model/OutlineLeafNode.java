@@ -37,7 +37,7 @@ import java.util.List;
  *
  * A node for OWLConstant, OWLIndividual and OWLDataRange
  */
-public class OutlineLeafNode<O extends OWLObject> extends AbstractOutlineNode<O, OWLPropertyNode> {
+class OutlineLeafNode<O extends OWLObject> extends AbstractOutlineNode<O, OWLPropertyNode> {
 
     private O obj;
 
@@ -60,6 +60,10 @@ public class OutlineLeafNode<O extends OWLObject> extends AbstractOutlineNode<O,
 
     public boolean isNavigable() {
         return false;
+    }
+
+    public Class<? extends OWLObject> getTypeOfChild() {
+        return null;
     }
 
     public boolean equals(Object object) {

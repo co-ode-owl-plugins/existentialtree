@@ -64,16 +64,16 @@ public class OutlineTree extends JTree {
             OWLEntityRenderer entRen = eKit.getOWLModelManager().getOWLEntityRenderer();
 
             text += "<html><body>";
-            text += "<b><font size='12pt'>" + objRen.render(node.getRenderedObject(), entRen) + "</font></b><br>";
+            text += "<b><font size='12pt'>" + objRen.render(node.getUserObject(), entRen) + "</font></b><br>";
 
-        text += "<b>" + node.getClass().getSimpleName() + "</b><br>";
-        text += "<b>" + objRen.render(node.getUserObject(), entRen) + "</b><br>";
+//            text += "<b>" + node.getClass().getSimpleName() + "</b><br>";
+//            text += "<b>" + objRen.render(node.getUserObject(), entRen) + "</b><br>";
 
-        Set<OWLAxiom> axioms = node.getAxioms();
-        for (OWLAxiom ax : axioms){
-            text += objRen.render(ax, entRen) + "<br>";
-        }
-        text += "</body></html>";
+            Set<OWLAxiom> axioms = node.getAxioms();
+            for (OWLAxiom ax : axioms){
+                text += objRen.render(ax, entRen) + "<br>";
+            }
+            text += "</body></html>";
 //        OWLObject obj = getOWLObjectAtMousePosition(event);
 
 //        if (obj instanceof OWLEntity) {

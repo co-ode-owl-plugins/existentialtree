@@ -44,6 +44,14 @@ public class OutlineNodeComparator implements Comparator<OutlineNode> {
     }
 
     public int compare(OutlineNode existentialNode, OutlineNode existentialNode1) {
-        return owlComparator.compare(existentialNode.getUserObject(), existentialNode1.getUserObject());
+        // first check to see if this is the same object
+        int result = owlComparator.compare(existentialNode.getUserObject(), existentialNode1.getUserObject());
+//        if (result == 0){
+//            // if it is, then check if it is here because of the same axioms
+//            if (existentialNode.getAxioms().equals(existentialNode1.getAxioms())){
+//                result = 1;
+//            }
+//        }
+        return result;
     }
 }

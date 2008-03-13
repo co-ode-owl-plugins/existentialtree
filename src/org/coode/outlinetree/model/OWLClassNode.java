@@ -1,13 +1,6 @@
 package org.coode.outlinetree.model;
 
-import org.coode.outlinetree.util.OutlinePropertyIndexer;
-import org.coode.outlinetree.util.SuperAndEquivAxiomFinder;
-import org.semanticweb.owl.model.*;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.semanticweb.owl.model.OWLClass;
 
 /*
 * Copyright (C) 2007, University of Manchester
@@ -40,107 +33,57 @@ import java.util.Set;
  * Bio Health Informatics Group<br>
  * Date: Mar 05, 2008<br><br>
  */
-public class OWLClassNode extends AbstractOutlineNode<OWLClass, OWLPropertyNode>{
-
-    private OWLClass cls;
-
-    private List<OutlineNode> children;
-
-
+class OWLClassNode extends OWLDescriptionNode<OWLClass>{
+    
     public OWLClassNode(OWLClass cls, OutlineTreeModel model) {
-        super(model);
-        this.cls = cls;
+        super(cls, model);
     }
 
-    protected void clear() {
-        children = null;
-    }
+//    protected void refresh() {
 
-    public OWLClass getUserObject() {
-        return cls;
-    }
+//        // things that can always be said about this class - root will always have these
+//        Set<OWLAxiom> globalAxioms = new HashSet<OWLAxiom>();
+//
+//        // things that can only be said about this class in this context
+//        Set<OWLAxiom> inheritedAxioms = new HashSet<OWLAxiom>();
+//        final Set<OWLAxiom> allAxioms = getAxioms();
+//
+//        // get any more global things we can say about the class at this node
+//        allAxioms.addAll(SuperAndEquivAxiomUtils.getAxioms(getUserObject(), getModel().getOntologies(), getModel().getClassHierarchyProvider()));
+//        for (OWLAxiom ax : allAxioms){
+//            if (isAboutThisClass(ax)){
+//                globalAxioms.add(ax);
+//            }
+//            else{
+//                inheritedAxioms.add(ax);
+//            }
+//        }
+//
+//        // if this is root class, the children created because of global axioms are editable
+//        // otherwise, these axioms are not editable (as we are not "talking about" this class)
+//        createChildren(globalAxioms, isRootClass());
+//
+////      // actually, a named class will never have further children because of inherited axioms
+//        createChildren(inheritedAxioms, false);
+//    }
 
-    public OWLClass getRenderedObject() {
-        return cls;
-    }
-
-    public List<OutlineNode> getChildren() {
-        if (children == null){
-            refresh();
-        }
-        return children;
-    }
-
-    private void refresh() {
-        if (children == null){
-            children = new ArrayList<OutlineNode>();
-
-            // things that can always be said about this class - root will always have these
-            Set<OWLAxiom> globalAxioms = new HashSet<OWLAxiom>();
-
-            // things that can only be said about this class in this context
-            Set<OWLAxiom> localAxioms = new HashSet<OWLAxiom>();
-            for (OWLAxiom ax : getAxioms()){
-                if (isAboutThisClass(ax)){
-                    globalAxioms.add(ax);
-                }
-                else{
-                    localAxioms.add(ax);
-                }
-            }
-
-            // get any more global things we can say about the class at this node
-            globalAxioms.addAll((SuperAndEquivAxiomFinder.getAxioms(cls, getModel().getOntologies(), true)));
-
-            // if this is root class, the children created because of global axioms are editable
-            // otherwise, these axioms are not editable (as we are not "talking about" this class)
-            createChildren(globalAxioms, isRootClass());
-
-//            // actually, a named class will never have further children because of inherited axioms
-//            assert(localAxioms.isEmpty()); // sanity check
-        }
-    }
-
-    private void createChildren(Set<OWLAxiom> axioms, boolean editable) {
-        OutlineTreeModel model = getModel();
-        Set<OWLPropertyExpression> filterproperties = model.getFilterProperties();
-        Set<OWLPropertyExpression> properties;
-        OutlinePropertyIndexer restrFinder = new OutlinePropertyIndexer(model.getOntologies(), model.getMin());
-        for (OWLAxiom ax : axioms){
-            ax.accept(restrFinder);
-        }
-        properties = restrFinder.getProperties();
-        if (filterproperties != null){
-            properties.retainAll(filterproperties); // only retain thos in the filter
-        }
-
-        // for each of the "properties on the class/description" create a child node
-        for (OWLPropertyExpression prop : properties){
-            Set<OWLRestriction> restrs = restrFinder.getRestrictions(prop);
-            final OWLPropertyNode child = model.createNode(prop, this);
-            child.setEditable(editable);
-            child.setRestrictions(restrs);
-            final Set<OWLAxiom> owlAxioms = restrFinder.getAxioms(prop);
-            child.addAxioms(owlAxioms);
-            children.add(child);
-        }
-    }
-
-    private boolean isAboutThisClass(OWLAxiom ax) {
-        if (ax instanceof OWLSubClassAxiom){
-            return ((OWLSubClassAxiom)ax).getSubClass().equals(cls);
-        }
-        else if (ax instanceof OWLEquivalentClassesAxiom){
-            return ((OWLEquivalentClassesAxiom)ax).getDescriptions().contains(cls);
-        }
-        return false;
-    }
-
-    private boolean isRootClass() {
-        return getParent() == null;
-    }
-
-    public boolean isNavigable() {
-        return true;
-    }
+//    private void createChildren(Set<OWLAxiom> axioms, boolean editable) {
+//        OutlineTreeModel model = getModel();
+//        OutlinePropertyIndexer finder = new OutlinePropertyIndexer(model.getOntologies(), model.getMin());
+//        for (OWLAxiom ax : axioms){
+//            ax.accept(finder);
+//        }
+//
+//        createChildren(finder, editable);
+//    }
+//
+//    private boolean isAboutThisClass(OWLAxiom ax) {
+//        if (ax instanceof OWLSubClassAxiom){
+//            return ((OWLSubClassAxiom)ax).getSubClass().equals(getUserObject());
+//        }
+//        else if (ax instanceof OWLEquivalentClassesAxiom){
+//            return ((OWLEquivalentClassesAxiom)ax).getDescriptions().contains(getUserObject());
+//        }
+//        return false;
+//    }
 }

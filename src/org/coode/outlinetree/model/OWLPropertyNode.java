@@ -90,6 +90,10 @@ class OWLPropertyNode extends AbstractOutlineNode<OWLPropertyExpression, Outline
         return true;
     }
 
+    public Class<? extends OWLObject> getTypeOfChild() {
+        return OWLClass.class;
+    }
+
     public OWLPropertyExpression getUserObject() {
         return property;
     }
