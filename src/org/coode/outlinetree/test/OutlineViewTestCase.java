@@ -61,77 +61,104 @@ public class OutlineViewTestCase extends TestCase {
 
     private static final URI ONTOLOGY_URI = URI.create("http://www.co-ode.org/ontologies/test/outlineview.owl");
 
-    public void testABCRoot(){
-        OWLOntologyManager mngr = OWLManager.createOWLOntologyManager();
+    private OWLOntologyManager mngr;
+    private OWLOntology ont;
+    private OWLClass a;
+    private OWLClass b;
+    private OWLClass c;
+    private OWLClass d;
+    private OWLClass e;
+
+    private OWLObjectProperty p;
+    private OWLObjectProperty q;
+    private OWLObjectProperty r;
+
+    private OWLSubClassAxiom aPSomeB;
+    private OWLSubClassAxiom aPSomeC;
+    private OWLSubClassAxiom aQSomeD;
+
+    private OWLObjectIntersectionOf cAndRSomeE;
+
+    public void init(){
         try {
-            OWLOntology ont = mngr.createOntology(ONTOLOGY_URI);
+            mngr = OWLManager.createOWLOntologyManager();
+            ont = mngr.createOntology(ONTOLOGY_URI);
+
             final OWLDataFactory df = mngr.getOWLDataFactory();
 
-            OWLClass a = df.getOWLClass(URI.create(ONTOLOGY_URI + "#A"));
-            OWLClass b = df.getOWLClass(URI.create(ONTOLOGY_URI + "#B"));
-            OWLClass c = df.getOWLClass(URI.create(ONTOLOGY_URI + "#C"));
-            OWLClass d = df.getOWLClass(URI.create(ONTOLOGY_URI + "#D"));
-            OWLClass e = df.getOWLClass(URI.create(ONTOLOGY_URI + "#E"));
+            a = df.getOWLClass(URI.create(ONTOLOGY_URI + "#A"));
+            b = df.getOWLClass(URI.create(ONTOLOGY_URI + "#B"));
+            c = df.getOWLClass(URI.create(ONTOLOGY_URI + "#C"));
+            d = df.getOWLClass(URI.create(ONTOLOGY_URI + "#D"));
+            e = df.getOWLClass(URI.create(ONTOLOGY_URI + "#E"));
 
-            OWLObjectProperty p = df.getOWLObjectProperty(URI.create(ONTOLOGY_URI + "#p"));
-            OWLObjectProperty q = df.getOWLObjectProperty(URI.create(ONTOLOGY_URI + "#q"));
-            OWLObjectProperty r = df.getOWLObjectProperty(URI.create(ONTOLOGY_URI + "#r"));
+            p = df.getOWLObjectProperty(URI.create(ONTOLOGY_URI + "#p"));
+            q = df.getOWLObjectProperty(URI.create(ONTOLOGY_URI + "#q"));
+            r = df.getOWLObjectProperty(URI.create(ONTOLOGY_URI + "#r"));
 
-            List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+            // build the axioms and descriptions
+            aPSomeB = df.getOWLSubClassAxiom(a, df.getOWLObjectSomeRestriction(p, b));
+            aPSomeC = df.getOWLSubClassAxiom(a, df.getOWLObjectSomeRestriction(p, cAndRSomeE));
+            aQSomeD = df.getOWLSubClassAxiom(a, df.getOWLObjectSomeRestriction(q, d));
 
-            final OWLSubClassAxiom aPSomeB = df.getOWLSubClassAxiom(a, df.getOWLObjectSomeRestriction(p, b));
             Set<OWLDescription> and = new HashSet<OWLDescription>();
             and.add(c);
             and.add(df.getOWLObjectSomeRestriction(r, e));
-            OWLObjectIntersectionOf cAndRSomeE = df.getOWLObjectIntersectionOf(and);
+            cAndRSomeE = df.getOWLObjectIntersectionOf(and);
 
-            final OWLSubClassAxiom aPSomeC = df.getOWLSubClassAxiom(a, df.getOWLObjectSomeRestriction(p, cAndRSomeE));
-            final OWLSubClassAxiom aQSomeD = df.getOWLSubClassAxiom(a, df.getOWLObjectSomeRestriction(q, d));
-
+            // build the test ontology
+            List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
             changes.add(new AddAxiom(ont, aPSomeB));
             changes.add(new AddAxiom(ont, aPSomeC));
             changes.add(new AddAxiom(ont, aQSomeD));
-
             mngr.applyChanges(changes);
-
-            OutlineTreeModel model = new OutlineTreeModel(mngr, Collections.singleton(ont), null, new BasicComparator());
-            model.setRoot(a);
-            OutlineNode aNode = model.getRoot();
-            assertTrue(aNode.getUserObject().equals(a));
-            assertTrue(aNode.getRenderedObject().equals(a));
-            assertNull(aNode.getParent());
-
-            assertEquals(2, model.getChildCount(aNode));
-
-            // test p
-            OutlineNode pNode = model.getChild(aNode, 1);
-            assertSame(p, pNode.getUserObject());
-            Set<OWLAxiom> pNodeAxioms = pNode.getAxioms();
-            assertSame(2, pNodeAxioms.size());
-
-            // test C
-            OutlineNode cNode = model.getChild(pNode, 0);
-            assertSame(cAndRSomeE, cNode.getUserObject()); // the anonymous class
-            assertSame(c, cNode.getRenderedObject()); // the displayed object
-            assertSame(1, model.getChildCount(cNode));
-
-
-            // test q
-            OutlineNode qNode = model.getChild(aNode, 0);
-            assertSame(q, qNode.getUserObject());
-            Set<OWLAxiom> qNodeAxioms = qNode.getAxioms();
-            assertSame(1, qNodeAxioms.size());
-
-            // test axioms
-//            final Set aNodeAxioms = aNode.getAxioms();
-//            assertEquals(3, aNodeAxioms.size());
-//            assertTrue(aNodeAxioms.contains(aPSomeB));
-//            assertTrue(aNodeAxioms.contains(aPSomeC));
-//            assertTrue(aNodeAxioms.contains(aQSomeD));
         }
         catch (Exception e) {
             e.printStackTrace();
             fail();
         }
+    }
+
+    public void testStructure(){
+        init();
+        OutlineTreeModel model = new OutlineTreeModel(mngr, Collections.singleton(ont), null, new BasicComparator());
+        model.setRoot(a);
+
+        OutlineNode aNode = model.getRoot();
+        assertTrue(aNode.getUserObject().equals(a));
+        assertTrue(aNode.getRenderedObject().equals(a));
+        assertNull(aNode.getParent());
+        assertEquals(2, model.getChildCount(aNode));
+
+        // test p
+        OutlineNode pNode = model.getChild(aNode, 1);
+        assertSame(p, pNode.getUserObject());
+        Set<OWLAxiom> pNodeAxioms = pNode.getAxioms();
+        assertSame(2, pNodeAxioms.size());
+
+        // test C
+        OutlineNode cNode = model.getChild(pNode, 0);
+        assertSame(cAndRSomeE, cNode.getUserObject()); // the anonymous class
+        assertSame(c, cNode.getRenderedObject()); // the displayed object
+        assertSame(1, model.getChildCount(cNode));
+
+        // test q
+        OutlineNode qNode = model.getChild(aNode, 0);
+        assertSame(q, qNode.getUserObject());
+        Set<OWLAxiom> qNodeAxioms = qNode.getAxioms();
+        assertSame(1, qNodeAxioms.size());
+    }
+
+    public void testAxiomsLoaded(){
+        init();
+        OutlineTreeModel model = new OutlineTreeModel(mngr, Collections.singleton(ont), null, new BasicComparator());
+        model.setRoot(a);
+        OutlineNode aNode = model.getRoot();
+
+        final Set aNodeAxioms = aNode.getAxioms();
+        assertEquals(3, aNodeAxioms.size());
+        assertTrue(aNodeAxioms.contains(aPSomeB));
+        assertTrue(aNodeAxioms.contains(aPSomeC));
+        assertTrue(aNodeAxioms.contains(aQSomeD));
     }
 }

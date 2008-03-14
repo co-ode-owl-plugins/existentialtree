@@ -3,9 +3,14 @@ package org.coode.outlinetree.ui;
 import org.coode.outlinetree.model.OutlineNode;
 import org.coode.outlinetree.model.OutlineNodeComparator;
 import org.coode.outlinetree.model.OutlineTreeModel;
+import org.protege.editor.core.ProtegeApplication;
 import org.protege.editor.core.ui.view.DisposableAction;
 import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.model.event.EventType;
+import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
+import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
+import org.protege.editor.owl.model.inference.NoOpReasoner;
 import org.protege.editor.owl.ui.OWLIcons;
 import org.protege.editor.owl.ui.UIHelper;
 import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
@@ -13,6 +18,7 @@ import org.protege.editor.owl.ui.renderer.OWLObjectRenderer;
 import org.protege.editor.owl.ui.selector.OWLDataPropertySelectorPanel;
 import org.protege.editor.owl.ui.selector.OWLObjectPropertySelectorPanel;
 import org.protege.editor.owl.ui.view.AbstractOWLClassViewComponent;
+import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.*;
 
 import javax.swing.*;
@@ -85,6 +91,15 @@ public class OutlineView extends AbstractOWLClassViewComponent {
         }
     };
 
+    private OWLModelManagerListener mngrListener = new OWLModelManagerListener(){
+
+        public void handleChange(OWLModelManagerChangeEvent event) {
+            if (event.isType(EventType.REASONER_CHANGED)){
+                refresh();
+            }
+        }
+    };
+
     private HierarchyListener hListener = new HierarchyListener(){
         public void hierarchyChanged(HierarchyEvent hierarchyEvent) {
             if (requiresRefresh){
@@ -148,13 +163,8 @@ public class OutlineView extends AbstractOWLClassViewComponent {
     public void initialiseClassView() throws Exception {
         setLayout(new BorderLayout());
 
-        OWLModelManager mngr = getOWLModelManager();
-        model = new OutlineTreeModel(mngr.getOWLOntologyManager(),
-                mngr.getActiveOntologies(),
-                mngr.getOWLClassHierarchyProvider(),
-                new OutlineNodeComparator(mngr));
-
         getOWLModelManager().addOntologyChangeListener(ontListener);
+        getOWLModelManager().addListener(mngrListener);
 
         getOWLWorkspace().addHierarchyListener(hListener);
 
@@ -164,15 +174,13 @@ public class OutlineView extends AbstractOWLClassViewComponent {
         addAction(showMinZeroAction, "C", "A");
         addAction(hideMinZeroAction, "C", "B");
 
-        showMinZeroAction.setEnabled(model.getMin() != 0);
-        hideMinZeroAction.setEnabled(model.getMin() == 0);
-
         clearFiltersAction.setEnabled(false);
     }
 
     public void disposeView() {
         tree.getSelectionModel().removeTreeSelectionListener(treeSelListener);
         getOWLModelManager().removeOntologyChangeListener(ontListener);
+        getOWLModelManager().removeListener(mngrListener);
         getOWLWorkspace().removeHierarchyListener(hListener);
 
         model = null;
@@ -184,21 +192,50 @@ public class OutlineView extends AbstractOWLClassViewComponent {
         if (isShowing()){
             OWLClass selectedOWLClass = getSelectedOWLClass();
             if (selectedOWLClass != null){
-                model.setRoot(selectedOWLClass);
+                createModel(selectedOWLClass);
                 if (tree == null){
                     tree = new OutlineTree(model, getOWLEditorKit());
                     tree.getSelectionModel().addTreeSelectionListener(treeSelListener);
 
                     add(new JScrollPane(tree), BorderLayout.CENTER);
                 }
+                else{
+                    tree.setModel(model);
+                }
 
                 expandFirstChildren();
+                showMinZeroAction.setEnabled(model.getMin() != 0);
+                hideMinZeroAction.setEnabled(model.getMin() == 0);
             }
             requiresRefresh = false;
         }
         else{
             requiresRefresh = true;
         }
+    }
+
+    private void createModel(OWLClass owlClass) {
+        OWLModelManager mngr = getOWLModelManager();
+        final OWLObjectHierarchyProvider<OWLClass> hp = getHierarchyProvider();
+
+        model = new OutlineTreeModel(mngr.getOWLOntologyManager(),
+                mngr.getActiveOntologies(),
+                hp,
+                new OutlineNodeComparator(mngr));
+        model.setRoot(owlClass);
+    }
+
+    private OWLObjectHierarchyProvider<OWLClass> getHierarchyProvider() {
+        OWLModelManager mngr = getOWLModelManager();
+        try {
+            if (!(mngr.getReasoner() instanceof NoOpReasoner) && mngr.getReasoner().isClassified()){
+                return mngr.getInferredOWLClassHierarchyProvider();
+            }
+        }
+        catch (OWLReasonerException e) {
+            ProtegeApplication.getErrorLog().handleError(Thread.currentThread(), e);
+        }
+        return mngr.getOWLClassHierarchyProvider();
     }
 
     private void expandFirstChildren() {
@@ -216,14 +253,14 @@ public class OutlineView extends AbstractOWLClassViewComponent {
     }
 
     protected OWLClass updateView(OWLClass selectedClass) {
-//        if (isSynchronizing()){
+        if (isSynchronizing()){
             if (!ignoreUpdateView){
                 refresh();
+                return (model == null || model.getRoot() == null) ? null : (OWLClass)model.getRoot().getUserObject();
             }
             ignoreUpdateView = false;
-//        }
-        OutlineNode rootNode = model.getRoot();
-        return (rootNode == null) ? null : (OWLClass)rootNode.getUserObject();
+        }
+        return selectedClass;
     }
 
     protected void updateHeader(OWLObject object) {
