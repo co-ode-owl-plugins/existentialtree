@@ -2,18 +2,26 @@
 
 <plugin>
 
-    <extension id="ExistentialTreeView"
-               point="org.protege.editor.core.application.ViewComponent">
-        <label value="Existential Tree"/>
-        <class value="org.coode.existentialtree.view.ExistentialTreeView"/>
-        <headerColor value="@org.protege.classcolor"/>
-        <category value="@org.protege.classcategory"/>
-    </extension>
-
     <extension id="ExistentialTreeView2"
                point="org.protege.editor.core.application.ViewComponent">
         <label value="Outline Tree"/>
         <class value="org.coode.outlinetree.ui.OutlineView"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="@org.protege.classcategory"/>
+    </extension>
+
+    <extension id="TextOutlineView"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="Text Outline Tree"/>
+        <class value="org.coode.outlinetree.ui.TextOutlineView"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="@org.protege.classcategory"/>
+    </extension>
+
+    <extension id="ExistentialTreeView"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="Existential Tree"/>
+        <class value="org.coode.existentialtree.view.ExistentialTreeView"/>
         <headerColor value="@org.protege.classcolor"/>
         <category value="@org.protege.classcategory"/>
     </extension>

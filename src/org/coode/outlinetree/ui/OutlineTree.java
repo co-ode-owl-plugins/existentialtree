@@ -45,6 +45,7 @@ import java.util.Set;
  * Date: Oct 29, 2007<br><br>
  */
 public class OutlineTree extends JTree {
+    
     private OWLEditorKit eKit;
 
     public OutlineTree(OutlineTreeModel model, OWLEditorKit eKit) {

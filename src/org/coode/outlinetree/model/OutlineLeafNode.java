@@ -66,11 +66,6 @@ class OutlineLeafNode<O extends OWLObject> extends AbstractOutlineNode<O, OWLPro
         return null;
     }
 
-    public boolean equals(Object object) {
-        return object.getClass().equals(getClass()) &&
-                obj.equals(((OutlineLeafNode)object).getUserObject());
-    }
-
     protected void clear() {
         // do nothing
     }

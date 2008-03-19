@@ -3,7 +3,9 @@ package org.coode.outlinetree.model;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLObject;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -23,7 +25,7 @@ abstract class AbstractOutlineNode<O extends OWLObject, P extends OutlineNode> i
     private boolean editable = true;
 
     private Set<OWLAxiom> axioms = new HashSet<OWLAxiom>();
-    
+
 
     public AbstractOutlineNode(OutlineTreeModel model) {
         this.model = model;
@@ -71,4 +73,18 @@ abstract class AbstractOutlineNode<O extends OWLObject, P extends OutlineNode> i
      * Called after the parent has been set to clear out any cached children
      */
     protected abstract void clear();
+
+
+    public int hashCode() {
+        List l = new ArrayList();
+        l.add(getUserObject());
+        l.add(getAxioms());
+        return l.hashCode();
+    }
+
+    public boolean equals(Object object) {
+        return object instanceof OutlineNode &&
+                ((OutlineNode)object).getUserObject().equals(getUserObject()) &&
+                ((OutlineNode)object).getAxioms().equals(getAxioms());
+    }
 }

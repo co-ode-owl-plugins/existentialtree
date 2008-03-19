@@ -159,11 +159,6 @@ class OWLDescriptionNode<O extends OWLDescription> extends AbstractOutlineNode<O
         return getUserObject().toString();
     }
 
-    public boolean equals(Object object) {
-        return object instanceof OWLDescriptionNode &&
-                descr.equals(((OWLDescriptionNode)object).getUserObject());
-    }
-
     private Set<OWLClass> getNamedClassesFromIntersection(OWLObjectIntersectionOf intersectionOf) {
         Set<OWLClass> namedClasses = new HashSet<OWLClass>();
         for (OWLDescription op : intersectionOf.getOperands()){

@@ -106,11 +106,6 @@ class OWLPropertyNode extends AbstractOutlineNode<OWLPropertyExpression, Outline
         return getUserObject().toString();
     }
 
-    public boolean equals(Object object) {
-        return object instanceof OWLPropertyNode &&
-                property.equals(((OWLPropertyNode)object).getUserObject());
-    }
-
     private void refresh() {
         children.clear();
 
