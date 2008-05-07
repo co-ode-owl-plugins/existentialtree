@@ -56,6 +56,11 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
     private OWLOntologyManager mngr;
     private int min = 1;
 
+    private boolean showInheritedChildrenAllNodes = false;
+
+    private boolean showAssertedChildrenAllNodes = false;
+
+
     /**
      *
      * @param mngr
@@ -72,6 +77,17 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
         this.subsumptionHierarchyProvider = subsumptionHierarchyProvider;
         this.comparator = comparator;
     }
+
+
+    public void setShowInheritedChildrenAllNodes(boolean show){
+        this.showInheritedChildrenAllNodes = show;
+    }
+
+
+    public void setShowAssertedChildrenAllNodes(boolean show) {
+        this.showAssertedChildrenAllNodes = show;
+    }
+
 
     public void setRoot(OWLClass cls){
         OutlineNode oldRoot = root;
@@ -142,14 +158,16 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
 
     public void setMin(int m){
         min = m;
-        setRoot(root.getUserObject()); // regenerate the root object
+        if (root != null){
+            setRoot(root.getUserObject()); // regenerate the root object
+        }
     }
 
     public <T extends OutlineNode> T createNode(OWLObject object, OutlineNode parent) {
         T node;
         if (object instanceof OWLConstant ||
-            object instanceof OWLDataRange ||
-            object instanceof OWLIndividual){
+                object instanceof OWLDataRange ||
+                object instanceof OWLIndividual){
             node = (T)new OutlineLeafNode(object, this);
         }
         else if (object instanceof OWLPropertyExpression){
@@ -225,5 +243,15 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
             return ((OWLEquivalentClassesAxiom)ax).getDescriptions().contains(owlObject);
         }
         return false;
+    }
+
+
+    public boolean getShowInheritedChildrenAllNodes() {
+        return showInheritedChildrenAllNodes;
+    }
+
+
+    public boolean getShowAssertedChildrenAllNodes() {
+        return showAssertedChildrenAllNodes;
     }
 }

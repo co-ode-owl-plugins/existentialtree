@@ -1,5 +1,5 @@
-<plugin version="1.0.2.existentialtree">
-	<download url="http://co-ode-owl-plugins.googlecode.com/files/org.coode.existentialtree_1_0_2.zip"/>
+<plugin version="1.0.3.existentialtree">
+	<download url="http://co-ode-owl-plugins.googlecode.com/files/org.coode.existentialtree_1_0_3.zip"/>
  	<website url="http://www.co-ode.org/downloads/protege-x/plugins.php#existential"/>
 	<readme url="http://www.co-ode.org/downloads/protege-x/readme.txt"/>
 </plugin>

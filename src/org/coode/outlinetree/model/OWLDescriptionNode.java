@@ -96,10 +96,17 @@ class OWLDescriptionNode<O extends OWLDescription> extends AbstractOutlineNode<O
                 child.addAxioms(getAxioms()); // always inherit the same axioms as this anon parent
             }
         }
+        else{
+            if (isRootClass() || model.getShowAssertedChildrenAllNodes()){
+                createChildrenFromAxioms(getSuperAndEquivs(descr.asOWLClass(), false), isRootClass());
+            }
+        }
 
-        // children from eg named classes in an intersection
-        createChildrenFromInheritedAxioms(finder);
+        if (model.getShowInheritedChildrenAllNodes()){ // children from eg named classes in an intersection
+            createChildrenFromAxioms(getGlobalAxioms(descr, finder), false);
+        }
     }
+
 
     // for each of the "properties on the class/description" create a child node
     protected void createChildren(OutlinePropertyIndexer finder, boolean editable) {
@@ -111,7 +118,9 @@ class OWLDescriptionNode<O extends OWLDescription> extends AbstractOutlineNode<O
             }
             child.setRestrictions(finder.getRestrictions(prop));
             child.setEditable(editable);
-            children.add(child);
+            if (!children.contains(child)){
+                children.add(child);
+            }
         }
     }
 
@@ -132,20 +141,25 @@ class OWLDescriptionNode<O extends OWLDescription> extends AbstractOutlineNode<O
         return properties;
     }
 
-    private void createChildrenFromInheritedAxioms(OutlinePropertyIndexer finder) {
-        // get any more global things we can say about the class at this node
+    // get any more global things we can say about the class at this node
+    private Set<OWLAxiom> getGlobalAxioms(OWLDescription descr, OutlinePropertyIndexer finder) {
         Set<OWLAxiom> globalAxioms = new HashSet<OWLAxiom>();
-        for (OWLClass cls : finder.getClassesToInheritFrom()){
-            globalAxioms.addAll(getSuperAndEquivs(cls));
-        }
+        final Set<OWLClass> ancestors = finder.getClassesToInheritFrom();
 
-        finder.clear();
-        for (OWLAxiom ax : globalAxioms){
+        for (OWLClass cls : ancestors){
+            globalAxioms.addAll(getSuperAndEquivs(cls, true));
+        }
+        return globalAxioms;
+    }
+
+    private void createChildrenFromAxioms(Set<OWLAxiom> axioms, boolean editable) {
+        OutlinePropertyIndexer finder = new OutlinePropertyIndexer(getModel().getOntologies(), getModel().getMin());
+        for (OWLAxiom ax : axioms){
             ax.accept(finder);
         }
-
-        createChildren(finder, isRootClass());
+        createChildren(finder, editable);
     }
+
 
     public boolean isNavigable() {
         return !descr.isAnonymous();
@@ -172,9 +186,9 @@ class OWLDescriptionNode<O extends OWLDescription> extends AbstractOutlineNode<O
         return namedClasses;
     }
 
-    private Set<OWLAxiom> getSuperAndEquivs(OWLClass cls) {
+    private Set<OWLAxiom> getSuperAndEquivs(OWLClass cls, boolean inherited) {
         return SuperAndEquivAxiomUtils.getAxioms(cls,
-                getModel().getOntologies(),
-                getModel().getClassHierarchyProvider());
+                                                 getModel().getOntologies(),
+                                                 inherited ? getModel().getClassHierarchyProvider() : null);
     }
 }

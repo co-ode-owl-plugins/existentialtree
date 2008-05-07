@@ -1,5 +1,6 @@
 package org.coode.outlinetree.ui;
 
+import org.coode.outlinetree.OutlineTreePreferences;
 import org.coode.outlinetree.model.OutlineNode;
 import org.coode.outlinetree.model.OutlineNodeComparator;
 import org.coode.outlinetree.model.OutlineTreeModel;
@@ -23,6 +24,7 @@ import org.semanticweb.owl.model.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.HashSet;
@@ -120,31 +122,44 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         }
     };
 
-    private DisposableAction showMinZeroAction = new DisposableAction("Show min 0", null){
-        public void dispose() {
-        }
-
-        public void actionPerformed(ActionEvent actionEvent) {
-            handleMinZeroToggle();
-            showMinZeroAction.setEnabled(model.getMin() != 0);
-            hideMinZeroAction.setEnabled(model.getMin() == 0);
-        }
-    };
-
-    private DisposableAction hideMinZeroAction = new DisposableAction("Hide min 0", null){
-        public void dispose() {
-        }
-
-        public void actionPerformed(ActionEvent actionEvent) {
-            handleMinZeroToggle();
-            showMinZeroAction.setEnabled(model.getMin() != 0);
-            hideMinZeroAction.setEnabled(model.getMin() == 0);
-        }
-    };
-
     private OWLObjectPropertySelectorPanel objPropSel;
     private OWLDataPropertySelectorPanel dataPropSel;
 
+    private JCheckBox selectAllObjectPropsCheckbox;
+
+    private JCheckBox selectAllDataPropsCheckbox;
+
+    private ActionListener propCheckboxListener = new ActionListener(){
+        public void actionPerformed(ActionEvent actionEvent) {
+            objPropSel.setEnabled(selectAllObjectPropsCheckbox.isSelected());
+            dataPropSel.setEnabled(selectAllDataPropsCheckbox.isSelected());
+        }
+    };
+
+    private JCheckBox minZeroCB;
+    private JCheckBox showInheritedCB;
+    private JCheckBox showAssertedCB;
+
+    private ActionListener minZeroChangeListener = new ActionListener(){
+        public void actionPerformed(ActionEvent event) {
+            OutlineTreePreferences.getInstance().setShowMinZero(minZeroCB.isSelected());
+            refresh();
+        }
+    };
+
+    private ActionListener showInheritedChangeLister = new ActionListener(){
+        public void actionPerformed(ActionEvent event) {
+            OutlineTreePreferences.getInstance().setShowInheritedChildrenAllNodes(showInheritedCB.isSelected());
+            refresh();
+        }
+    };
+
+        private ActionListener showAssertedChangeLister = new ActionListener(){
+        public void actionPerformed(ActionEvent event) {
+            OutlineTreePreferences.getInstance().setShowAssertedChildrenAllNodes(showAssertedCB.isSelected());
+            refresh();
+        }
+    };
 
     public void initialiseClassView() throws Exception {
         setLayout(new BorderLayout());
@@ -157,8 +172,22 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
 //        addAction(addExistentialRestrictionAction, "A", "A");
         addAction(filterPropertiesAction, "B", "A");
         addAction(clearFiltersAction, "B", "B");
-        addAction(showMinZeroAction, "C", "A");
-        addAction(hideMinZeroAction, "C", "B");
+
+        minZeroCB = new JCheckBox("Show min 0");
+        minZeroCB.addActionListener(minZeroChangeListener);
+
+        showInheritedCB = new JCheckBox("Show inherited");
+        showInheritedCB.addActionListener(showInheritedChangeLister);
+
+        showAssertedCB = new JCheckBox("Show asserted (for all nodes)");
+        showAssertedCB.addActionListener(showAssertedChangeLister);
+
+        JToolBar tools = new JToolBar();
+        tools.setFloatable(false);
+        tools.add(minZeroCB);
+        tools.add(showInheritedCB);
+        tools.add(showAssertedCB);
+        add(tools, BorderLayout.NORTH);
 
         clearFiltersAction.setEnabled(false);
     }
@@ -171,7 +200,6 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         model = null;
     }
 
-
     protected void refresh() {
         if (isShowing()){
             OWLClass selectedOWLClass = getSelectedOWLClass();
@@ -180,8 +208,7 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
 
                 refreshGUI();
 
-                showMinZeroAction.setEnabled(model.getMin() != 0);
-                hideMinZeroAction.setEnabled(model.getMin() == 0);
+                refreshPreferences();
             }
             requiresRefresh = false;
         }
@@ -190,19 +217,30 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         }
     }
 
+
     protected abstract void refreshGUI();
+
+
+    private void refreshPreferences() {
+        minZeroCB.setSelected(OutlineTreePreferences.getInstance().getShowMinZero());
+        showAssertedCB.setSelected(OutlineTreePreferences.getInstance().getShowAssertedChildrenAllNodes());
+        showInheritedCB.setSelected(OutlineTreePreferences.getInstance().getShowInheritedChildrenAllNodes());
+    }
 
     private void createModel(OWLClass owlClass) {
         OWLModelManager mngr = getOWLModelManager();
         final OWLObjectHierarchyProvider<OWLClass> hp = getHierarchyProvider();
 
         model = new OutlineTreeModel(mngr.getOWLOntologyManager(),
-                mngr.getActiveOntologies(),
-                hp,
+                mngr.getActiveOntologies(), hp,
                 new OutlineNodeComparator(mngr));
+        model.setShowInheritedChildrenAllNodes(OutlineTreePreferences.getInstance().getShowInheritedChildrenAllNodes());
+        model.setShowAssertedChildrenAllNodes(OutlineTreePreferences.getInstance().getShowAssertedChildrenAllNodes());
+        model.setMin(OutlineTreePreferences.getInstance().getShowMinZero() ? 0 : 1);
         model.setRoot(owlClass);
+
         if (!propertyFilter.isEmpty()){
-        model.setProperties(propertyFilter);
+            model.setProperties(propertyFilter);
         }
     }
 
@@ -313,16 +351,58 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         if (objPropSel == null){
             objPropSel = new OWLObjectPropertySelectorPanel(getOWLEditorKit());
             dataPropSel = new OWLDataPropertySelectorPanel(getOWLEditorKit());
+            selectAllObjectPropsCheckbox = new JCheckBox("Select all object properties");
+            selectAllDataPropsCheckbox = new JCheckBox("Select all data properties");
         }
 
-        JSplitPane splitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, objPropSel, dataPropSel);
+        JPanel objPanel = new JPanel(new BorderLayout());
+        objPanel.add(selectAllObjectPropsCheckbox, BorderLayout.NORTH);
+        objPanel.add(objPropSel, BorderLayout.CENTER);
+
+        JPanel dataPanel = new JPanel(new BorderLayout());
+        dataPanel.add(selectAllDataPropsCheckbox, BorderLayout.NORTH);
+        dataPanel.add(dataPropSel, BorderLayout.CENTER);
+
+        JSplitPane splitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, objPanel, dataPanel);
+
+        selectAllObjectPropsCheckbox.addActionListener(propCheckboxListener);
+        selectAllDataPropsCheckbox.addActionListener(propCheckboxListener);
 
         if (new UIHelper(getOWLEditorKit()).showDialog("Select filter properties", splitter) == JOptionPane.OK_OPTION){
-            props.addAll(objPropSel.getSelectedOWLObjectProperties());
-            props.addAll(dataPropSel.getSelectedOWLDataProperties());
+            if (selectAllObjectPropsCheckbox.isSelected()){
+                props.addAll(getAllObjectProperties());
+            }
+            else{
+                props.addAll(objPropSel.getSelectedOWLObjectProperties());
+            }
+            if (selectAllDataPropsCheckbox.isSelected()){
+                props.addAll(getAllDataProperties());
+            }
+            else{
+                props.addAll(dataPropSel.getSelectedOWLDataProperties());
+            }
         }
         return props;
     }
+
+
+    private Set<OWLObjectProperty> getAllObjectProperties() {
+        Set<OWLObjectProperty> props = new HashSet<OWLObjectProperty>();
+        for (OWLOntology ont : model.getOntologies()){
+            props.addAll(ont.getReferencedObjectProperties());
+        }
+        return props;
+    }
+
+
+        private Set<OWLDataProperty> getAllDataProperties() {
+        Set<OWLDataProperty> props = new HashSet<OWLDataProperty>();
+        for (OWLOntology ont : model.getOntologies()){
+            props.addAll(ont.getReferencedDataProperties());
+        }
+        return props;
+    }
+
 
     private void handleClearProperty() {
         propertyLabel = ALL_PROPERTIES;
@@ -331,14 +411,4 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         updateHeader(getSelectedOWLClass());
         setEnabled(false);
     }
-
-    private void handleMinZeroToggle() {
-        if (model.getMin() == 0){
-            model.setMin(1);
-        }
-        else{
-            model.setMin(0);
-        }
-    }
-
 }

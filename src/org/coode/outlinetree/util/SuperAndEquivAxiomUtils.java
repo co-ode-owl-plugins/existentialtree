@@ -42,21 +42,24 @@ import java.util.Set;
 public class SuperAndEquivAxiomUtils {
 
     /**
-     * Pull together all subclass and equivclass restriction axioms for this class including inherited ones.
+     * Pull together subclass and equivclass restriction axioms.
      * @param cls
      * @param onts must match the ontologies loaded into the hp if given
      * @param hp a hierarchy provider used to determine the superclasses to collect inherited axioms (if null, no inheritance)
-     * @return
+     * @return If an hp is omitted, this method returns only directly asserted restrictions.
+     * If a hp is provided, this method returns only inherited restrictions.
      */
     public static Set<OWLAxiom> getAxioms(OWLClass cls, Set<OWLOntology> onts, OWLObjectHierarchyProvider<OWLClass> hp){
         Set<OWLAxiom>allObjects = new HashSet<OWLAxiom>();
         for (OWLOntology ont : onts){
-            allObjects.addAll(ont.getSubClassAxiomsForLHS(cls));
-            allObjects.addAll(ont.getEquivalentClassesAxioms(cls));
             if (hp != null){
                 for (OWLClass parent : hp.getAncestors(cls)){
                     allObjects.addAll(getAxioms(parent, onts, null));
                 }
+            }
+            else{
+                allObjects.addAll(ont.getSubClassAxiomsForLHS(cls));
+                allObjects.addAll(ont.getEquivalentClassesAxioms(cls));
             }
         }
         return allObjects;
