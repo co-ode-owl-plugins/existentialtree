@@ -5,8 +5,6 @@ import org.coode.existentialtree.ui.AbstractOWLDescriptionHierarchyViewComponent
 import org.protege.editor.core.ui.view.DisposableAction;
 import org.protege.editor.owl.ui.OWLIcons;
 import org.protege.editor.owl.ui.UIHelper;
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
-import org.protege.editor.owl.ui.renderer.OWLObjectRenderer;
 import org.semanticweb.owl.model.*;
 
 import java.awt.event.ActionEvent;
@@ -154,9 +152,7 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLD
     protected void updateHeader(OWLObject object) {
         String str = "(" + propertyLabel + ")";
         if (object != null){
-            final OWLObjectRenderer owlObjectRenderer = getOWLModelManager().getOWLObjectRenderer();
-            final OWLEntityRenderer owlEntityRenderer = getOWLModelManager().getOWLEntityRenderer();
-            str += " " + owlObjectRenderer.render(object, owlEntityRenderer);
+            str += " " + getOWLModelManager().getRendering(object);
         }
         getView().setHeaderText(str);
     }

@@ -1,8 +1,6 @@
 package org.coode.outlinetree.ui;
 
 import org.coode.outlinetree.model.OutlineNode;
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
-import org.protege.editor.owl.ui.renderer.OWLObjectRenderer;
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
@@ -104,9 +102,7 @@ public class OutlineView extends AbstractOutlineView {
     protected void updateHeader(OWLObject object) {
         String str = "(" + propertyLabel + ")";
         if (object != null){
-            final OWLObjectRenderer owlObjectRenderer = getOWLModelManager().getOWLObjectRenderer();
-            final OWLEntityRenderer owlEntityRenderer = getOWLModelManager().getOWLEntityRenderer();
-            str += " " + owlObjectRenderer.render(object, owlEntityRenderer);
+            str += " " + getOWLModelManager().getRendering(object);
         }
         getView().setHeaderText(str);
     }

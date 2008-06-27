@@ -3,8 +3,6 @@ package org.coode.outlinetree.ui;
 import org.coode.outlinetree.model.OutlineNode;
 import org.coode.outlinetree.model.OutlineTreeModel;
 import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
-import org.protege.editor.owl.ui.renderer.OWLObjectRenderer;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLObject;
 
@@ -61,18 +59,15 @@ public class OutlineTree extends JTree {
         String text = "";
         if (node != null){
 
-            OWLObjectRenderer objRen = eKit.getOWLModelManager().getOWLObjectRenderer();
-            OWLEntityRenderer entRen = eKit.getOWLModelManager().getOWLEntityRenderer();
-
             text += "<html><body>";
-            text += "<b><font size='12pt'>" + objRen.render(node.getUserObject(), entRen) + "</font></b><br>";
+            text += "<b><font size='12pt'>" + eKit.getOWLModelManager().getRendering(node.getUserObject()) + "</font></b><br>";
 
 //            text += "<b>" + node.getClass().getSimpleName() + "</b><br>";
 //            text += "<b>" + objRen.render(node.getUserObject(), entRen) + "</b><br>";
 
             Set<OWLAxiom> axioms = node.getAxioms();
             for (OWLAxiom ax : axioms){
-                text += objRen.render(ax, entRen) + "<br>";
+                text += eKit.getOWLModelManager().getRendering(ax) + "<br>";
             }
             text += "</body></html>";
 //        OWLObject obj = getOWLObjectAtMousePosition(event);

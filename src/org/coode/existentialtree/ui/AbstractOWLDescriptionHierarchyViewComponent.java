@@ -73,7 +73,7 @@ public abstract class AbstractOWLDescriptionHierarchyViewComponent extends Abstr
                         return super.getToolTipText(event);
                     }
                     else{
-                        return getOWLModelManager().getOWLObjectRenderer().render(obj, getOWLModelManager().getOWLEntityRenderer());
+                        return getOWLModelManager().getRendering(obj);
                     }
                 }
             };

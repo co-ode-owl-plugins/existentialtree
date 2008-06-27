@@ -13,8 +13,6 @@ import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
 import org.protege.editor.owl.model.inference.NoOpReasoner;
 import org.protege.editor.owl.ui.OWLIcons;
 import org.protege.editor.owl.ui.UIHelper;
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
-import org.protege.editor.owl.ui.renderer.OWLObjectRenderer;
 import org.protege.editor.owl.ui.selector.OWLDataPropertySelectorPanel;
 import org.protege.editor.owl.ui.selector.OWLObjectPropertySelectorPanel;
 import org.protege.editor.owl.ui.view.AbstractOWLClassViewComponent;
@@ -272,9 +270,7 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
     protected void updateHeader(OWLObject object) {
         String str = "(" + propertyLabel + ")";
         if (object != null){
-            final OWLObjectRenderer owlObjectRenderer = getOWLModelManager().getOWLObjectRenderer();
-            final OWLEntityRenderer owlEntityRenderer = getOWLModelManager().getOWLEntityRenderer();
-            str += " " + owlObjectRenderer.render(object, owlEntityRenderer);
+            str += " " + getOWLModelManager().getRendering(object);
         }
         getView().setHeaderText(str);
     }
