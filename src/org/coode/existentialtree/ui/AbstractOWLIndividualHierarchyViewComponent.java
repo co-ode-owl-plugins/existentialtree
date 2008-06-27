@@ -19,6 +19,7 @@ import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 /*
@@ -247,7 +248,7 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
 
     public java.util.List<OWLIndividual> find(String match) {
         // Here we should just find classes
-        return getOWLModelManager().getMatchingOWLIndividuals(match);
+        return new ArrayList<OWLIndividual>(getOWLModelManager().getEntityFinder().getMatchingOWLIndividuals(match));
     }
 
     public void show(OWLIndividual individual) {

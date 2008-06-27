@@ -336,7 +336,7 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
             propertyLabel = "";
             propertyFilter.clear();
             for (OWLProperty p : props){
-                propertyLabel += getOWLModelManager().getOWLEntityRenderer().render(p) + ", ";
+                propertyLabel += getOWLModelManager().getRendering(p) + ", ";
                 propertyFilter.addAll(generateAllDescendants(p));
             }
             clearFiltersAction.setEnabled(true);

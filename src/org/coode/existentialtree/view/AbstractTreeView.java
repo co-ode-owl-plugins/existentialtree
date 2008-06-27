@@ -164,7 +164,7 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLD
     private void handleSelectProperty() {
         OWLObjectProperty prop = new UIHelper(getOWLEditorKit()).pickOWLObjectProperty();
         if (prop != null){
-            propertyLabel = getOWLModelManager().getOWLEntityRenderer().render(prop);
+            propertyLabel = getOWLModelManager().getRendering(prop);
             clearPropertyAction.setEnabled(true);
             getHierarchyProvider().setProp(prop);
             refresh();
