@@ -1,7 +1,7 @@
 package org.coode.outlinetree.model;
 
 import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.ui.OWLObjectComparator;
+import org.semanticweb.owl.model.OWLObject;
 
 import java.util.Comparator;
 /*
@@ -37,10 +37,10 @@ import java.util.Comparator;
  */
 public class OutlineNodeComparator implements Comparator<OutlineNode> {
 
-    private OWLObjectComparator owlComparator;
+    private Comparator<OWLObject> owlComparator;
 
     public OutlineNodeComparator(OWLModelManager mngr){
-        owlComparator = new OWLObjectComparator(mngr);
+        owlComparator = mngr.getOWLObjectComparator();
     }
 
     public int compare(OutlineNode existentialNode, OutlineNode existentialNode1) {

@@ -2,7 +2,6 @@ package org.coode.existentialtree.ui;
 
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.protege.editor.owl.ui.OWLObjectComparator;
 import org.protege.editor.owl.ui.tree.OWLModelManagerTree;
 import org.protege.editor.owl.ui.tree.OWLObjectTree;
 import org.protege.editor.owl.ui.tree.OWLObjectTreeCellRenderer;
@@ -17,6 +16,7 @@ import javax.swing.event.TreeSelectionListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Comparator;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -78,7 +78,8 @@ public abstract class AbstractOWLDescriptionHierarchyViewComponent extends Abstr
                 }
             };
 
-            tree.setOWLObjectComparator(new OWLObjectComparator<OWLDescription>(getOWLModelManager()));
+            final Comparator<OWLDescription> comp = getOWLModelManager().getOWLObjectComparator();
+            tree.setOWLObjectComparator(comp);
 
             tree.setCellRenderer(new OWLObjectTreeCellRenderer(getOWLEditorKit()){
 
