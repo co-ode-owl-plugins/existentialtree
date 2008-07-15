@@ -16,6 +16,7 @@ import javax.swing.event.TreeSelectionListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Comparator;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -257,7 +258,7 @@ public abstract class AbstractOWLDescriptionHierarchyViewComponent extends Abstr
 
         public java.util.List<OWLClass> find(String match) {
             // Here we should just find classes
-            return getOWLModelManager().getMatchingOWLClasses(match);
+            return new ArrayList<OWLClass>(getOWLModelManager().getEntityFinder().getMatchingOWLClasses(match));
         }
 
         public void show(OWLClass cls) {

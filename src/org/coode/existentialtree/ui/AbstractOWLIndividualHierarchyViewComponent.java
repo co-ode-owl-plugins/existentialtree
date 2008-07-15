@@ -247,7 +247,7 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
 
 
     public java.util.List<OWLIndividual> find(String match) {
-        // Here we should just find classes
+        // Here we should just find individuals
         return new ArrayList<OWLIndividual>(getOWLModelManager().getEntityFinder().getMatchingOWLIndividuals(match));
     }
 
