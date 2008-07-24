@@ -73,7 +73,7 @@ public class ObjectPropertyCombo extends JComboBox {
     public ObjectPropertyCombo (OWLEditorKit eKit) {
         super();
 
-        mngr = eKit.getOWLModelManager();
+        mngr = eKit.getModelManager();
 
         comp = new OWLEntityComparator<OWLProperty>(mngr);
 

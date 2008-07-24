@@ -60,14 +60,14 @@ public class OutlineTree extends JTree {
         if (node != null){
 
             text += "<html><body>";
-            text += "<b><font size='12pt'>" + eKit.getOWLModelManager().getRendering(node.getUserObject()) + "</font></b><br>";
+            text += "<b><font size='12pt'>" + eKit.getModelManager().getRendering(node.getUserObject()) + "</font></b><br>";
 
 //            text += "<b>" + node.getClass().getSimpleName() + "</b><br>";
 //            text += "<b>" + objRen.render(node.getUserObject(), entRen) + "</b><br>";
 
             Set<OWLAxiom> axioms = node.getAxioms();
             for (OWLAxiom ax : axioms){
-                text += eKit.getOWLModelManager().getRendering(ax) + "<br>";
+                text += eKit.getModelManager().getRendering(ax) + "<br>";
             }
             text += "</body></html>";
 //        OWLObject obj = getOWLObjectAtMousePosition(event);

@@ -369,13 +369,13 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
                 props.addAll(getAllObjectProperties());
             }
             else{
-                props.addAll(objPropSel.getSelectedOWLObjectProperties());
+                props.addAll(objPropSel.getSelectedObjects());
             }
             if (selectAllDataPropsCheckbox.isSelected()){
                 props.addAll(getAllDataProperties());
             }
             else{
-                props.addAll(dataPropSel.getSelectedOWLDataProperties());
+                props.addAll(dataPropSel.getSelectedObjects());
             }
         }
         return props;
