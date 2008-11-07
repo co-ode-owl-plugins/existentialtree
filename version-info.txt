@@ -1,0 +1,15 @@
+The subsumption hierarchy is not the only "axis" on which an ontology relies. Many other axis (such as partOf) can be useful for navigation.
+
+The Outline View follows existential (and appropriate cardinality) restrictions to build up a view of the current class by its structure.
+
+The Existential Tree view is a simplified version that shows the tree along a specified property.
+
+
+Version info
+------------
+
+v1.0.4 (7th Nov 2008)
+- auto-update activated
+
+
+See also: http://www.co-ode.org/downloads/protege-x/plugins/#existentialtree

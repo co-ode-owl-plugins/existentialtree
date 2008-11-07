@@ -7,10 +7,11 @@ Bundle-Description: A Plugin that produces a tree view along an
  alternative axis to subsumption
 Bundle-Vendor: The CO-ODE Group
 Bundle-DocURL: http://www.co-ode.org
+Update-Url: http://co-ode-owl-plugins.googlecode.com/svn/trunk/existentialtree/update.properties
 Bundle-ClassPath: .
 Import-Package: org.osgi.framework,
  org.apache.log4j
-Bundle-Version: 1.0.3
+Bundle-Version: 1.0.4
 Bundle-Activator: org.protege.editor.core.plugin.DefaultPluginActivator
 Require-Bundle: org.eclipse.equinox.registry,
  org.eclipse.equinox.common,
