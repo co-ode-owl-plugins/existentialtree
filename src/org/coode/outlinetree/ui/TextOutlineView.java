@@ -1,7 +1,6 @@
 package org.coode.outlinetree.ui;
 
 import org.coode.outlinetree.model.OutlineNode;
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.protege.editor.owl.ui.renderer.OWLObjectRenderer;
 import org.protege.editor.owl.ui.renderer.OWLObjectRendererImpl;
 
@@ -49,7 +48,6 @@ public class TextOutlineView extends AbstractOutlineView {
     private Set<OutlineNode> renderedNodes = new HashSet<OutlineNode>();
 
     private OWLObjectRenderer objRen;
-    private OWLEntityRenderer entRen;
 
     public int indent = 0;
 
@@ -103,7 +101,6 @@ public class TextOutlineView extends AbstractOutlineView {
                 return indent;
             }
         };
-        entRen = getOWLModelManager().getOWLEntityRenderer();
         renderNode(root, indent);
     }
 
@@ -113,7 +110,7 @@ public class TextOutlineView extends AbstractOutlineView {
             str += "\t";
         }
 
-        str += objRen.render(node.getRenderedObject(), entRen);
+        str += objRen.render(node.getRenderedObject(), null);
         str += "\n";
 
         editor.append(str);
