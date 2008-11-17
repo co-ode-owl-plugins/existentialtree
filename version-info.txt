@@ -1,12 +1,13 @@
 <html>
 <body>
+<h2>Outline/Existential Tree</h2>
 <p>The subsumption hierarchy is not the only "axis" on which an ontology relies.
  Many other axis (such as partOf) can be useful for navigation.
 
-The <b>Outline View</b> follows existential (and appropriate cardinality) restrictions
+<p>The <b>Outline View</b> follows existential (and appropriate cardinality) restrictions
  to build up a view of the current class by its structure.
 
-The <b>Existential Tree view</b> is a simplified version that shows the tree along a specified property.
+<p>The <b>Existential Tree view</b> is a simplified version that shows the tree along a specified property.
 
 <p><a href="http://code.google.com/p/co-ode-owl-plugins/wiki/OutlineView">Documentation</a>
 
