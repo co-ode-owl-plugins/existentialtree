@@ -176,7 +176,7 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
     }
 
 
-    protected OWLIndividual updateView(OWLIndividual individual) {
+    public OWLIndividual updateView(OWLIndividual individual) {
         if (tree.getSelectedOWLObject() == null) {
             if (individual != null) {
                 tree.setSelectedOWLObject(individual);
