@@ -1,9 +1,7 @@
-package org.coode.outlinetree.model;
+package org.coode.existentialtree.view;
 
-import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.OWLObject;
-
-import java.util.Comparator;
+import org.coode.existentialtree.model.AbstractHierarchyProvider;
+import org.coode.existentialtree.model.ReciprocalsHierarchyProvider;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -28,34 +26,23 @@ import java.util.Comparator;
 */
 
 /**
- * Author: Nick Drummond<br>
+ * Author: drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
  * <p/>
  * The University Of Manchester<br>
  * Bio Health Informatics Group<br>
- * Date: Oct 29, 2007<br><br>
+ * Date: May 18, 2009<br><br>
  */
-public class OutlineNodeComparator implements Comparator<OutlineNode> {
+public class ReciprocalsTreeView extends AbstractTreeView {
 
-    private Comparator<OWLObject> owlComparator;
+    private ReciprocalsHierarchyProvider provider;
 
-    public OutlineNodeComparator(OWLModelManager mngr){
-        owlComparator = mngr.getOWLObjectComparator();
-    }
 
-    public int compare(OutlineNode existentialNode, OutlineNode existentialNode1) {
-        // first check to see if this is the same object
-        final Object o = existentialNode.getUserObject();
-        final Object o1 = existentialNode1.getUserObject();
-        if (o instanceof OWLObject && o1 instanceof OWLObject){
-        return owlComparator.compare((OWLObject)o, (OWLObject)o1);
+    protected AbstractHierarchyProvider getHierarchyProvider() {
+        if (provider == null){
+            provider = new ReciprocalsHierarchyProvider(getOWLModelManager().getOWLOntologyManager());
+            provider.setOntologies(getOWLModelManager().getActiveOntologies());
         }
-        else if (o instanceof Comparable && o1 instanceof Comparable){
-            return ((Comparable)o).compareTo(((Comparable)o1));
-        }
-        else if (o.hashCode() != o1.hashCode()){
-            return (o.hashCode() > o1.hashCode()) ? 1 : -1;
-        }
-        return 0;
+        return provider;
     }
 }

@@ -55,9 +55,8 @@ public class OutlineView extends AbstractOutlineView {
     };
 
     public void disposeView() {
-        super.disposeView();
         tree.getSelectionModel().removeTreeSelectionListener(treeSelListener);
-        tree = null;
+        super.disposeView();
     }
 
     protected void refreshGUI() {
@@ -115,5 +114,7 @@ public class OutlineView extends AbstractOutlineView {
             ignoreUpdateView = true;
             getOWLWorkspace().getOWLSelectionModel().setSelectedEntity((OWLEntity)owlObject);
         }
+
+        addNodeAction.setEnabled(node.isEditable());
     }
 }

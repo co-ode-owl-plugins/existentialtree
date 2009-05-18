@@ -4,7 +4,6 @@ import org.coode.outlinetree.model.OutlineNode;
 import org.coode.outlinetree.model.OutlineTreeModel;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owl.model.OWLAxiom;
-import org.semanticweb.owl.model.OWLObject;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
@@ -60,7 +59,7 @@ public class OutlineTree extends JTree {
         if (node != null){
 
             text += "<html><body>";
-            text += "<b><font size='12pt'>" + eKit.getModelManager().getRendering(node.getUserObject()) + "</font></b><br>";
+            text += "<b><font size='12pt'>" + /*eKit.getModelManager().getRendering(*/node.getUserObject()/*)*/ + "</font></b><br>";
 
 //            text += "<b>" + node.getClass().getSimpleName() + "</b><br>";
 //            text += "<b>" + objRen.render(node.getUserObject(), entRen) + "</b><br>";
@@ -79,9 +78,9 @@ public class OutlineTree extends JTree {
         return text;
     }
 
-    protected OWLObject getOWLObjectAtMousePosition(MouseEvent event){
-        return getNodeAtMousePosition(event).getUserObject();
-    }
+//    protected OWLObject getOWLObjectAtMousePosition(MouseEvent event){
+//        return getNodeAtMousePosition(event).getUserObject();
+//    }
 
     protected OutlineNode getNodeAtMousePosition(MouseEvent event){
         Point pt = event.getPoint();

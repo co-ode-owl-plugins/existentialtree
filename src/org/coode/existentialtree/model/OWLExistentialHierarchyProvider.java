@@ -57,7 +57,7 @@ public class OWLExistentialHierarchyProvider extends AbstractHierarchyProvider<O
         super(owlOntologyManager.getOWLOntologyManager());
         ontologies = owlOntologyManager.getOntologies();
         root = owlOntologyManager.getOWLDataFactory().getOWLThing();
-        hp = owlOntologyManager.getOWLObjectPropertyHierarchyProvider();
+        hp = owlOntologyManager.getOWLHierarchyManager().getOWLObjectPropertyHierarchyProvider();
     }
 
     public void setOntologies(Set<OWLOntology> ontologies) {
@@ -65,16 +65,11 @@ public class OWLExistentialHierarchyProvider extends AbstractHierarchyProvider<O
     }
 
     public Set<OWLDescription> getRoots() {
-        if (root != null){
-            return Collections.singleton(root);
-        }
-        else{
-            return Collections.EMPTY_SET;
-        }
+        return root != null ? Collections.singleton(root) : Collections.EMPTY_SET;
     }
 
     public Set<OWLDescription> getChildren(OWLDescription object) {
-            return fillerAccumulator.getExistentialFillers(object, ontologies);
+        return fillerAccumulator.getExistentialFillers(object, ontologies);
     }
 
     public Set<OWLDescription> getParents(OWLDescription object) {

@@ -44,6 +44,7 @@ public class ExistentialTreeView extends AbstractTreeView {
     protected AbstractHierarchyProvider<OWLDescription> getHierarchyProvider() {
         if (treeProvider == null){
             treeProvider = new OWLExistentialHierarchyProvider(getOWLModelManager());
+            treeProvider.setOntologies(getOWLModelManager().getActiveOntologies());
         }
         return treeProvider;
     }

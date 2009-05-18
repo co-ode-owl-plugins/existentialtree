@@ -185,20 +185,32 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
 
     public List<OWLOntologyChange> add(OutlineNode child, OutlineNode parent, OWLOntology ont) {
         List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+
+        final OWLDataFactory df = mngr.getOWLDataFactory();
+
         if (parent instanceof OWLPropertyNode && child instanceof OWLClassNode){
             OWLDescription cls = ((OWLPropertyNode)parent).getParent().getUserObject();
-            OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)parent).getUserObject();
+            OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)parent).getRenderedObject();
             OWLDescription filler = ((OWLClassNode)child).getUserObject();
-            OWLDescription restr = mngr.getOWLDataFactory().getOWLObjectSomeRestriction(p, filler);
-            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLSubClassAxiom(cls, restr)));
+            OWLDescription restr = df.getOWLObjectSomeRestriction(p, filler);
+
+            // if it exists, overwrite the default p some Thing with the more specific restriction
+            OWLObjectSomeRestriction pSomeThing = df.getOWLObjectSomeRestriction(p, df.getOWLThing());
+            OWLAxiom clsSubPSomeThing = df.getOWLSubClassAxiom(cls, pSomeThing);
+            if (ont.containsAxiom(clsSubPSomeThing)){
+                changes.add(new RemoveAxiom(ont, clsSubPSomeThing));
+            }
+
+            changes.add(new AddAxiom(ont, df.getOWLSubClassAxiom(cls, restr)));
         }
         else if (parent instanceof OWLClassNode && child instanceof OWLPropertyNode){
             // "adding a property to a class" = adding subClassOf(cls, someValuesFrom(p, owlThing))
             OWLDescription cls = ((OWLClassNode)parent).getUserObject();
-            OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)child).getUserObject();
-            OWLDescription restr = mngr.getOWLDataFactory().getOWLObjectSomeRestriction(p, mngr.getOWLDataFactory().getOWLThing());
-            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLSubClassAxiom(cls, restr)));
+            OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)child).getRenderedObject();
+            OWLDescription restr = df.getOWLObjectSomeRestriction(p, df.getOWLThing());
+            changes.add(new AddAxiom(ont, df.getOWLSubClassAxiom(cls, restr)));
         }
+        
         return changes;
     }
 

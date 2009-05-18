@@ -34,4 +34,14 @@
         <category value="@org.protege.individualcategory"/>
     </extension>
 
+
+    <extension id="ReciprocalsTreeView"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="Reverse Existential Tree"/>
+        <class value="org.coode.existentialtree.view.ReciprocalsTreeView"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="@org.protege.classcategory"/>
+    </extension>
+
+
 </plugin>

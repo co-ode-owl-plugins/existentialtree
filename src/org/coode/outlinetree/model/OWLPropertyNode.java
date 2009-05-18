@@ -64,7 +64,7 @@ import java.util.*;
  * Each property node is therefore a collection:
  * Multiple objects that relate a single description or individual to multiple fillers or individuals
  */
-class OWLPropertyNode extends AbstractOutlineNode<OWLPropertyExpression, OutlineNode<OWLDescription, OutlineNode>> {
+class OWLPropertyNode extends AbstractOutlineNode<Set<OWLRestriction>/*OWLPropertyExpression*/, OutlineNode<OWLDescription, OutlineNode>> {
 
     private OWLPropertyExpression property;
     private List<OutlineNode> orderedChildren;
@@ -94,8 +94,8 @@ class OWLPropertyNode extends AbstractOutlineNode<OWLPropertyExpression, Outline
         return OWLClass.class;
     }
 
-    public OWLPropertyExpression getUserObject() {
-        return property;
+    public Set<OWLRestriction> getUserObject() {
+        return new HashSet<OWLRestriction>(restrs);
     }
 
     public OWLPropertyExpression getRenderedObject() {
@@ -147,6 +147,8 @@ class OWLPropertyNode extends AbstractOutlineNode<OWLPropertyExpression, Outline
 
     /**
      * Used to map the restrictions back to the axioms that contain them
+     *
+     * Dangerous - the restriction could be in a different axiom in a different place in the tree
      */
     class AxiomFinder extends OutlineRestrictionVisitor {
 

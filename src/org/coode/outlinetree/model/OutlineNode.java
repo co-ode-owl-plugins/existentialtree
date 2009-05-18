@@ -36,7 +36,7 @@ import java.util.Set;
  * Bio Health Informatics Group<br>
  * Date: Oct 29, 2007<br><br>
  */
-public interface OutlineNode<O extends OWLObject, P extends OutlineNode> {
+public interface OutlineNode<O, P extends OutlineNode> {
 
     O getUserObject();
 

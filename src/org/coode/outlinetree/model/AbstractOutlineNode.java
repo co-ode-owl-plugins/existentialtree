@@ -1,7 +1,6 @@
 package org.coode.outlinetree.model;
 
 import org.semanticweb.owl.model.OWLAxiom;
-import org.semanticweb.owl.model.OWLObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -16,7 +15,7 @@ import java.util.Set;
  * Bio Health Informatics Group<br>
  * Date: Feb 28, 2008<br><br>
  */
-abstract class AbstractOutlineNode<O extends OWLObject, P extends OutlineNode> implements OutlineNode<O, P>{
+abstract class AbstractOutlineNode<O, P extends OutlineNode> implements OutlineNode<O, P>{
 
     private P parent;
 

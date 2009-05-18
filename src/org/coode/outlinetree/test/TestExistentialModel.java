@@ -5,7 +5,10 @@ import org.apache.commons.lang.StringUtils;
 import org.coode.outlinetree.model.OutlineNode;
 import org.coode.outlinetree.model.OutlineTreeModel;
 import org.semanticweb.owl.apibinding.OWLManager;
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owl.model.OWLClass;
+import org.semanticweb.owl.model.OWLObjectProperty;
+import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 import java.net.URI;
 /*
@@ -127,7 +130,7 @@ public class TestExistentialModel extends TestCase {
         for (int i=0; i<model.getChildCount(start); i++){
             OutlineNode child = model.getChild(start, i);
             System.out.println(StringUtils.leftPad("+ " + child, indent*2));
-            OWLObject obj = child.getUserObject();
+            Object obj = child.getUserObject();
             if (obj.equals(namedClass)){
                 return child;
             }

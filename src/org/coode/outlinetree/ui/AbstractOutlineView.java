@@ -59,6 +59,7 @@ import java.util.Set;
  * Date: Mar 19, 2008<br><br>
  */
 public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent {
+
     protected OutlineTreeModel model;
 
     protected OutlineNode currentSelection; // @@TODO or shall we just ask the tree for this when needed?
@@ -94,7 +95,7 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         }
     };
 
-    private DisposableAction addExistentialRestrictionAction = new DisposableAction("Add Existential Restriction", OWLIcons.getIcon("class.add.sub.png")){
+    protected DisposableAction addNodeAction = new DisposableAction("Add Some Restriction", OWLIcons.getIcon("class.add.sub.png")){
         public void actionPerformed(ActionEvent actionEvent) {
             handleAddNode();
         }
@@ -167,7 +168,7 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
 
         getOWLWorkspace().addHierarchyListener(hListener);
 
-//        addAction(addExistentialRestrictionAction, "A", "A");
+        addAction(addNodeAction, "A", "A");
         addAction(filterPropertiesAction, "B", "A");
         addAction(clearFiltersAction, "B", "B");
 

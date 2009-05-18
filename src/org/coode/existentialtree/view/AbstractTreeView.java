@@ -3,6 +3,9 @@ package org.coode.existentialtree.view;
 import org.coode.existentialtree.model.AbstractHierarchyProvider;
 import org.coode.existentialtree.ui.AbstractOWLDescriptionHierarchyViewComponent;
 import org.protege.editor.core.ui.view.DisposableAction;
+import org.protege.editor.owl.model.event.EventType;
+import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
+import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.protege.editor.owl.ui.OWLIcons;
 import org.protege.editor.owl.ui.UIHelper;
 import org.semanticweb.owl.model.*;
@@ -89,6 +92,16 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLD
         }
     };
 
+    private OWLModelManagerListener mngrListener = new OWLModelManagerListener(){
+
+        public void handleChange(OWLModelManagerChangeEvent event) {
+            if (event.getType().equals(EventType.ACTIVE_ONTOLOGY_CHANGED)){
+                getHierarchyProvider().setOntologies(getOWLModelManager().getActiveOntologies());
+            }
+        }
+    };
+
+
     protected void handleAddNode() {
         //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -96,6 +109,8 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLD
     protected void performExtraInitialisation() throws Exception {
 
         getOWLModelManager().addOntologyChangeListener(ontListener);
+
+        getOWLModelManager().addListener(mngrListener);
 
         getOWLWorkspace().addHierarchyListener(hListener);
 
@@ -108,9 +123,11 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLD
 
     public void disposeView() {
         getOWLModelManager().removeOntologyChangeListener(ontListener);
+        getOWLModelManager().removeListener(mngrListener);
         getOWLWorkspace().removeHierarchyListener(hListener);
         ontListener = null;
         hListener = null;
+        mngrListener = null;
         super.disposeView();
     }
 
