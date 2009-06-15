@@ -13,6 +13,9 @@
 
 <h3>Version info</h3>
 
+<h4>v1.0.6 (15th June 2009)</h4>
+<ul><li>fixed reverse existential tree to show all properties correctly</li></ul>
+
 <h4>v1.0.5 (18th May 2009)</h4>
 <ul><li>added reverse existential tree</li></ul>
 

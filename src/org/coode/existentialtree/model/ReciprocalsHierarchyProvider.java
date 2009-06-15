@@ -117,6 +117,12 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
     }
 
 
+    private boolean followProperty(OWLObjectPropertyExpression candidate){
+        // @@TODO take property hierarchy into account
+        return prop == null || prop.equals(candidate);
+    }
+
+
     class ReciprocalAxiomVisitor extends OWLAxiomVisitorAdapter {
 
         private ReciprocalExpressionVisitor exprVisitor = new ReciprocalExpressionVisitor();
@@ -157,8 +163,8 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
 
 
             public void visit(OWLObjectSomeRestriction restriction) {
-                if (restriction.getProperty().equals(prop) && // @@TODO take property hierarchy into account
-                    restriction.getFiller().equals(cls)){ // @@TODO fillers in intersections
+                if (followProperty(restriction.getProperty()) &&
+                    restriction.getFiller().equals(cls)){ // @@TODO fillers in intersections?
                     recip = true;
                 }
             }
@@ -166,8 +172,8 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
 
             public void visit(OWLObjectMinCardinalityRestriction restriction) {
                 if (restriction.getCardinality() > 0 &&
-                    restriction.getProperty().equals(prop) && // @@TODO take property hierarchy into account
-                    restriction.getFiller().equals(cls)){ // @@TODO fillers in intersections
+                    followProperty(restriction.getProperty()) &&
+                    restriction.getFiller().equals(cls)){ // @@TODO fillers in intersections?
                     recip = true;
                 }
             }
@@ -175,8 +181,8 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
 
             public void visit(OWLObjectExactCardinalityRestriction restriction) {
                 if (restriction.getCardinality() > 0 &&
-                    restriction.getProperty().equals(prop) && // @@TODO take property hierarchy into account
-                    restriction.getFiller().equals(cls)){ // @@TODO fillers in intersections
+                    followProperty(restriction.getProperty()) &&
+                    restriction.getFiller().equals(cls)){ // @@TODO fillers in intersections?
                     recip = true;
                 }
             }
