@@ -15,9 +15,9 @@ import org.protege.editor.owl.ui.OWLIcons;
 import org.protege.editor.owl.ui.UIHelper;
 import org.protege.editor.owl.ui.selector.OWLDataPropertySelectorPanel;
 import org.protege.editor.owl.ui.selector.OWLObjectPropertySelectorPanel;
-import org.protege.editor.owl.ui.view.AbstractOWLClassViewComponent;
-import org.semanticweb.owl.inference.OWLReasonerException;
-import org.semanticweb.owl.model.*;
+import org.protege.editor.owl.ui.view.cls.AbstractOWLClassViewComponent;
+import org.semanticweb.owlapi.inference.OWLReasonerException;
+import org.semanticweb.owlapi.model.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -247,13 +247,13 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         OWLModelManager mngr = getOWLModelManager();
         try {
             if (!(mngr.getReasoner() instanceof NoOpReasoner) && mngr.getReasoner().isClassified()){
-                return mngr.getInferredOWLClassHierarchyProvider();
+                return mngr.getOWLHierarchyManager().getInferredOWLClassHierarchyProvider();
             }
         }
         catch (OWLReasonerException e) {
             ProtegeApplication.getErrorLog().handleError(Thread.currentThread(), e);
         }
-        return mngr.getOWLClassHierarchyProvider();
+        return mngr.getOWLHierarchyManager().getOWLClassHierarchyProvider();
     }
 
 
@@ -280,12 +280,14 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         Set<OWLProperty> propAndDescendants = null;
         if (prop != null){
             if (prop instanceof OWLObjectProperty){
-                OWLObjectHierarchyProvider<OWLObjectProperty> ohp = getOWLModelManager().getOWLObjectPropertyHierarchyProvider();
+                OWLObjectHierarchyProvider<OWLObjectProperty> ohp =
+                        getOWLModelManager().getOWLHierarchyManager().getOWLObjectPropertyHierarchyProvider();
                 propAndDescendants = new HashSet<OWLProperty>(ohp.getDescendants((OWLObjectProperty)prop));
                 propAndDescendants.add(prop);
             }
             else if (prop instanceof OWLDataProperty){
-                OWLObjectHierarchyProvider<OWLDataProperty> dhp = getOWLModelManager().getOWLDataPropertyHierarchyProvider();
+                OWLObjectHierarchyProvider<OWLDataProperty> dhp =
+                        getOWLModelManager().getOWLHierarchyManager().getOWLDataPropertyHierarchyProvider();
                 propAndDescendants = new HashSet<OWLProperty>(dhp.getDescendants((OWLDataProperty)prop));
                 propAndDescendants.add(prop);
             }

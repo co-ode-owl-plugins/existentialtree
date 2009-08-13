@@ -1,9 +1,9 @@
 package org.coode.outlinetree.util;
 
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.semanticweb.owl.model.OWLAxiom;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLOntology;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -58,7 +58,7 @@ public class SuperAndEquivAxiomUtils {
                 }
             }
             else{
-                allObjects.addAll(ont.getSubClassAxiomsForLHS(cls));
+                allObjects.addAll(ont.getSubClassAxiomsForSubClass(cls));
                 allObjects.addAll(ont.getEquivalentClassesAxioms(cls));
             }
         }

@@ -2,7 +2,7 @@ package org.coode.existentialtree.view;
 
 import org.coode.existentialtree.model.AbstractHierarchyProvider;
 import org.coode.existentialtree.model.OWLExistentialHierarchyProvider;
-import org.semanticweb.owl.model.OWLDescription;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -41,7 +41,7 @@ public class ExistentialTreeView extends AbstractTreeView {
     private AbstractHierarchyProvider treeProvider;
 
 
-    protected AbstractHierarchyProvider<OWLDescription> getHierarchyProvider() {
+    protected AbstractHierarchyProvider<OWLClassExpression> getHierarchyProvider() {
         if (treeProvider == null){
             treeProvider = new OWLExistentialHierarchyProvider(getOWLModelManager());
             treeProvider.setOntologies(getOWLModelManager().getActiveOntologies());

@@ -3,9 +3,9 @@ package org.coode.existentialtree.model;
 import org.coode.outlinetree.util.ExistentialFillerAccumulator;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLObjectProperty;
-import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -43,13 +43,13 @@ import java.util.Set;
  * Date: Apr 24, 2007<br><br>
  * <p/>
  */
-public class OWLExistentialHierarchyProvider extends AbstractHierarchyProvider<OWLDescription> {
+public class OWLExistentialHierarchyProvider extends AbstractHierarchyProvider<OWLClassExpression> {
 
     private Set<OWLOntology> ontologies;
 
     private ExistentialFillerAccumulator fillerAccumulator = new ExistentialFillerAccumulator();
 
-    private OWLDescription root;
+    private OWLClassExpression root;
 
     private OWLObjectHierarchyProvider<OWLObjectProperty> hp;
 
@@ -64,27 +64,27 @@ public class OWLExistentialHierarchyProvider extends AbstractHierarchyProvider<O
         this.ontologies = ontologies;
     }
 
-    public Set<OWLDescription> getRoots() {
+    public Set<OWLClassExpression> getRoots() {
         return root != null ? Collections.singleton(root) : Collections.EMPTY_SET;
     }
 
-    public Set<OWLDescription> getChildren(OWLDescription object) {
+    public Set<OWLClassExpression> getChildren(OWLClassExpression object) {
         return fillerAccumulator.getExistentialFillers(object, ontologies);
     }
 
-    public Set<OWLDescription> getParents(OWLDescription object) {
-        return Collections.EMPTY_SET;
+    public Set<OWLClassExpression> getParents(OWLClassExpression object) {
+        return Collections.emptySet();
     }
 
-    public Set<OWLDescription> getEquivalents(OWLDescription object) {
-        return Collections.EMPTY_SET;
+    public Set<OWLClassExpression> getEquivalents(OWLClassExpression object) {
+        return Collections.emptySet();
     }
 
-    public boolean containsReference(OWLDescription object) {
+    public boolean containsReference(OWLClassExpression object) {
         return object.equals(root);
     }
 
-    public void setRoot(OWLDescription selectedClass) {
+    public void setRoot(OWLClassExpression selectedClass) {
         root = selectedClass;
     }
 

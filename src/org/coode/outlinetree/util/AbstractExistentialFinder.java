@@ -1,7 +1,7 @@
 package org.coode.outlinetree.util;
 
-import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.util.OWLObjectVisitorAdapter;
+import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.util.OWLObjectVisitorAdapter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -47,7 +47,7 @@ public abstract class AbstractExistentialFinder extends OWLObjectVisitorAdapter 
     }
 
 
-    public void visit(OWLSubClassAxiom owlSubClassAxiom) {
+    public void visit(OWLSubClassOfAxiom owlSubClassAxiom) {
         if (!visitedObjects.contains(owlSubClassAxiom)){
             visitedObjects.add(owlSubClassAxiom); // prevent cycles
             owlSubClassAxiom.getSuperClass().accept(this);
@@ -57,8 +57,8 @@ public abstract class AbstractExistentialFinder extends OWLObjectVisitorAdapter 
     public void visit(OWLEquivalentClassesAxiom owlEquivalentClassesAxiom) {
         if (!visitedObjects.contains(owlEquivalentClassesAxiom)){
             visitedObjects.add(owlEquivalentClassesAxiom); // prevent cycles
-            Set<OWLDescription> equivs = owlEquivalentClassesAxiom.getDescriptions();
-            for (OWLDescription equiv : equivs){
+            Set<OWLClassExpression> equivs = owlEquivalentClassesAxiom.getClassExpressions();
+            for (OWLClassExpression equiv : equivs){
 //                if (!visitedObjects.contains(base)){
                     equiv.accept(this);
 //                }
@@ -66,34 +66,34 @@ public abstract class AbstractExistentialFinder extends OWLObjectVisitorAdapter 
         }
     }
 
-    public void visit(OWLObjectSomeRestriction restriction) {
+    public void visit(OWLObjectSomeValuesFrom restriction) {
         handleQuantifiedRestriction(restriction);
     }
 
-    public void visit(OWLDataSomeRestriction restriction) {
+    public void visit(OWLDataSomeValuesFrom restriction) {
         handleQuantifiedRestriction(restriction);
     }
 
-    public void visit(OWLObjectMinCardinalityRestriction restriction) {
+    public void visit(OWLObjectMinCardinality restriction) {
         handleCardinality(restriction);
     }
 
-    public void visit(OWLObjectExactCardinalityRestriction restriction) {
+    public void visit(OWLObjectExactCardinality restriction) {
         handleCardinality(restriction);
     }
 
-    public void visit(OWLDataMinCardinalityRestriction restriction){
+    public void visit(OWLDataMinCardinality restriction){
         handleCardinality(restriction);
     }
 
-    public void visit(OWLDataExactCardinalityRestriction restriction){
+    public void visit(OWLDataExactCardinality restriction){
         handleCardinality(restriction);
     }
 
     public void visit(OWLObjectIntersectionOf owlObjectIntersectionOf) {
         if (!visitedObjects.contains(owlObjectIntersectionOf)){
             visitedObjects.add(owlObjectIntersectionOf);
-            for (OWLDescription desc : owlObjectIntersectionOf.getOperands()) {
+            for (OWLClassExpression desc : owlObjectIntersectionOf.getOperands()) {
                 desc.accept(this);
             }
         }

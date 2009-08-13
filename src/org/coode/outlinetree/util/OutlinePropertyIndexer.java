@@ -1,6 +1,6 @@
 package org.coode.outlinetree.util;
 
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owlapi.model.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -84,7 +84,7 @@ public class OutlinePropertyIndexer extends OutlineRestrictionVisitor {
         classesToInheritFrom.add(owlClass);
     }
 
-    public void visit(OWLSubClassAxiom owlSubClassAxiom) {
+    public void visit(OWLSubClassOfAxiom owlSubClassAxiom) {
         currentAxiom = owlSubClassAxiom;
         super.visit(owlSubClassAxiom);
         currentAxiom = null;

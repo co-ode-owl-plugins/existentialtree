@@ -1,6 +1,6 @@
 package org.coode.outlinetree.model;
 
-import org.semanticweb.owl.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClass;
 
 /*
 * Copyright (C) 2007, University of Manchester
@@ -33,57 +33,9 @@ import org.semanticweb.owl.model.OWLClass;
  * Bio Health Informatics Group<br>
  * Date: Mar 05, 2008<br><br>
  */
-class OWLClassNode extends OWLDescriptionNode<OWLClass>{
+class OWLClassNode extends OWLClassExpressionNode<OWLClass>{
     
     public OWLClassNode(OWLClass cls, OutlineTreeModel model) {
         super(cls, model);
     }
-
-//    protected void refresh() {
-
-//        // things that can always be said about this class - root will always have these
-//        Set<OWLAxiom> globalAxioms = new HashSet<OWLAxiom>();
-//
-//        // things that can only be said about this class in this context
-//        Set<OWLAxiom> inheritedAxioms = new HashSet<OWLAxiom>();
-//        final Set<OWLAxiom> allAxioms = getAxioms();
-//
-//        // get any more global things we can say about the class at this node
-//        allAxioms.addAll(SuperAndEquivAxiomUtils.getAxioms(getUserObject(), getModel().getOntologies(), getModel().getClassHierarchyProvider()));
-//        for (OWLAxiom ax : allAxioms){
-//            if (isAboutThisClass(ax)){
-//                globalAxioms.add(ax);
-//            }
-//            else{
-//                inheritedAxioms.add(ax);
-//            }
-//        }
-//
-//        // if this is root class, the children created because of global axioms are editable
-//        // otherwise, these axioms are not editable (as we are not "talking about" this class)
-//        createChildren(globalAxioms, isRootClass());
-//
-////      // actually, a named class will never have further children because of inherited axioms
-//        createChildren(inheritedAxioms, false);
-//    }
-
-//    private void createChildren(Set<OWLAxiom> axioms, boolean editable) {
-//        OutlineTreeModel model = getModel();
-//        OutlinePropertyIndexer finder = new OutlinePropertyIndexer(model.getOntologies(), model.getMin());
-//        for (OWLAxiom ax : axioms){
-//            ax.accept(finder);
-//        }
-//
-//        createChildren(finder, editable);
-//    }
-//
-//    private boolean isAboutThisClass(OWLAxiom ax) {
-//        if (ax instanceof OWLSubClassAxiom){
-//            return ((OWLSubClassAxiom)ax).getSubClass().equals(getUserObject());
-//        }
-//        else if (ax instanceof OWLEquivalentClassesAxiom){
-//            return ((OWLEquivalentClassesAxiom)ax).getDescriptions().contains(getUserObject());
-//        }
-//        return false;
-//    }
 }

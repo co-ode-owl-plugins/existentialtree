@@ -1,7 +1,7 @@
 package org.coode.outlinetree.model;
 
-import org.semanticweb.owl.model.OWLAxiom;
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLObject;
 
 import java.util.List;
 import java.util.Set;

@@ -1,9 +1,9 @@
 package org.coode.outlinetree.ui;
 
 import org.coode.outlinetree.model.OutlineNode;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLEntity;
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLObject;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -55,7 +55,9 @@ public class OutlineView extends AbstractOutlineView {
     };
 
     public void disposeView() {
-        tree.getSelectionModel().removeTreeSelectionListener(treeSelListener);
+        if (tree != null){
+            tree.getSelectionModel().removeTreeSelectionListener(treeSelListener);
+        }
         super.disposeView();
     }
 

@@ -1,9 +1,9 @@
 package org.coode.existentialtree.model;
 
 import org.protege.editor.owl.model.hierarchy.AbstractOWLObjectHierarchyProvider;
-import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.model.OWLObjectProperty;
-import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 /*
 * Copyright (C) 2007, University of Manchester
 *

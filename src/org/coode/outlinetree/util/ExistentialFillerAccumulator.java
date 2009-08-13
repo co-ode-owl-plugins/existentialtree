@@ -1,7 +1,7 @@
 package org.coode.outlinetree.util;
 
-import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.util.OWLDescriptionVisitorAdapter;
+import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.util.OWLClassExpressionVisitorAdapter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,9 +39,9 @@ import java.util.Set;
  * <p/>
  * Also accumulates inherited restrictions
  */
-public class ExistentialFillerAccumulator extends OWLDescriptionVisitorAdapter {
+public class ExistentialFillerAccumulator extends OWLClassExpressionVisitorAdapter {
 
-    private Set<OWLDescription> fillers = new HashSet<OWLDescription>();
+    private Set<OWLClassExpression> fillers = new HashSet<OWLClassExpression>();
     private Set<OWLObjectProperty> properties;
     private Set<OWLOntology> onts;
 
@@ -53,15 +53,15 @@ public class ExistentialFillerAccumulator extends OWLDescriptionVisitorAdapter {
         this.properties = properties;
     }
 
-    public Set<OWLDescription> getExistentialFillers(OWLDescription cls, Set<OWLOntology> ontologies) {
+    public Set<OWLClassExpression> getExistentialFillers(OWLClassExpression cls, Set<OWLOntology> ontologies) {
         fillers.clear();
         onts = ontologies;
         if (cls instanceof OWLClass){
             for (OWLOntology ont : ontologies){
-                for (OWLDescription restr : ((OWLClass)cls).getSuperClasses(ont)) {
+                for (OWLClassExpression restr : ((OWLClass)cls).getSuperClasses(ont)) {
                     restr.accept(this);
                 }
-                for (OWLDescription restr : ((OWLClass)cls).getEquivalentClasses(ont)) {
+                for (OWLClassExpression restr : ((OWLClass)cls).getEquivalentClasses(ont)) {
                     restr.accept(this);
                 }
             }
@@ -74,7 +74,7 @@ public class ExistentialFillerAccumulator extends OWLDescriptionVisitorAdapter {
 
     public Set<OWLClass> getNamedExistentialFillers(OWLClass cls, Set<OWLOntology> ontologies) {
         Set<OWLClass> results = new HashSet<OWLClass>();
-        for (OWLDescription filler : getExistentialFillers(cls, ontologies)){
+        for (OWLClassExpression filler : getExistentialFillers(cls, ontologies)){
             if (filler instanceof OWLClass){
                 results.add((OWLClass)filler);
             }
@@ -88,29 +88,29 @@ public class ExistentialFillerAccumulator extends OWLDescriptionVisitorAdapter {
         fillers.addAll(acc.getExistentialFillers(desc, onts));
     }
 
-    public void visit(OWLObjectSomeRestriction desc) {
+    public void visit(OWLObjectSomeValuesFrom desc) {
         if (properties == null || properties.contains(desc.getProperty())) {
 
             fillers.add(desc.getFiller());
         }
     }
 
-    public void visit(OWLObjectMinCardinalityRestriction desc) {
+    public void visit(OWLObjectMinCardinality desc) {
         if (desc.getCardinality() > 0 &&
             (properties == null || properties.contains(desc.getProperty()))) {
 
-            OWLDescription filler = desc.getFiller();
+            OWLClassExpression filler = desc.getFiller();
             if (filler != null) {
                 fillers.add(filler);
             }
         }
     }
 
-    public void visit(OWLObjectExactCardinalityRestriction desc) {
+    public void visit(OWLObjectExactCardinality desc) {
         if (desc.getCardinality() > 0 &&
             properties == null || properties.contains(desc.getProperty())) {
 
-            OWLDescription filler = desc.getFiller();
+            OWLClassExpression filler = desc.getFiller();
             if (filler != null) {
                 fillers.add(filler);
             }
@@ -119,7 +119,7 @@ public class ExistentialFillerAccumulator extends OWLDescriptionVisitorAdapter {
 
     // need to flatten intersections - particularly for equiv classes which are often A and (restriction)
     public void visit(OWLObjectIntersectionOf and) {
-        for (OWLDescription desc : and.getOperands()) {
+        for (OWLClassExpression desc : and.getOperands()) {
             if (!fillers.contains(desc)){
                 desc.accept(this);
             }

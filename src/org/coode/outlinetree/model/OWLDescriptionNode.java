@@ -2,7 +2,7 @@ package org.coode.outlinetree.model;
 
 import org.coode.outlinetree.util.OutlinePropertyIndexer;
 import org.coode.outlinetree.util.SuperAndEquivAxiomUtils;
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owlapi.model.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,12 +41,12 @@ import java.util.Set;
  *
  * Node for anonymous class expressions
  */
-class OWLDescriptionNode<O extends OWLDescription> extends AbstractOutlineNode<O, OWLPropertyNode> {
+class OWLClassExpressionNode<O extends OWLClassExpression> extends AbstractOutlineNode<O, OWLPropertyNode> {
 
     private O descr;
     private List<OutlineNode> children;
 
-    public OWLDescriptionNode(O descr, OutlineTreeModel model){
+    public OWLClassExpressionNode(O descr, OutlineTreeModel model){
         super(model);
         this.descr = descr;
     }
@@ -55,8 +55,8 @@ class OWLDescriptionNode<O extends OWLDescription> extends AbstractOutlineNode<O
         return descr;
     }
 
-    public OWLDescription getRenderedObject() {
-        OWLDescription renderedObject = descr; // default to rendering the object directly
+    public OWLClassExpression getRenderedObject() {
+        OWLClassExpression renderedObject = descr; // default to rendering the object directly
         if (descr.isAnonymous() && getChildren().size() > 0){ // if there are any children, we should be able to name the object
             renderedObject =  getModel().getOWLThing(); // default to owl:Thing
 
@@ -142,7 +142,7 @@ class OWLDescriptionNode<O extends OWLDescription> extends AbstractOutlineNode<O
     }
 
     // get any more global things we can say about the class at this node
-    private Set<OWLAxiom> getGlobalAxioms(OWLDescription descr, OutlinePropertyIndexer finder) {
+    private Set<OWLAxiom> getGlobalAxioms(OWLClassExpression descr, OutlinePropertyIndexer finder) {
         Set<OWLAxiom> globalAxioms = new HashSet<OWLAxiom>();
         final Set<OWLClass> ancestors = finder.getClassesToInheritFrom();
 
@@ -175,7 +175,7 @@ class OWLDescriptionNode<O extends OWLDescription> extends AbstractOutlineNode<O
 
     private Set<OWLClass> getNamedClassesFromIntersection(OWLObjectIntersectionOf intersectionOf) {
         Set<OWLClass> namedClasses = new HashSet<OWLClass>();
-        for (OWLDescription op : intersectionOf.getOperands()){
+        for (OWLClassExpression op : intersectionOf.getOperands()){
             if (op instanceof OWLClass){
                 namedClasses.add((OWLClass)op);
             }

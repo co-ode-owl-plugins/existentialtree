@@ -1,8 +1,8 @@
 package org.coode.existentialtree.model;
 
-import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.util.OWLAxiomVisitorAdapter;
-import org.semanticweb.owl.util.OWLDescriptionVisitorAdapter;
+import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.util.OWLAxiomVisitorAdapter;
+import org.semanticweb.owlapi.util.OWLClassExpressionVisitorAdapter;
 
 import java.util.*;
 /*
@@ -141,7 +141,7 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
             return reciprocal;
         }
 
-        public void visit(OWLSubClassAxiom owlSubClassAxiom) {
+        public void visit(OWLSubClassOfAxiom owlSubClassAxiom) {
             if (exprVisitor.isReciprocal(owlSubClassAxiom.getSuperClass()) &&
                 !owlSubClassAxiom.getSubClass().isAnonymous()){
                 reciprocal = owlSubClassAxiom.getSubClass().asOWLClass();
@@ -151,18 +151,18 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
         // @@TODO defined classes
 
 
-        class ReciprocalExpressionVisitor extends OWLDescriptionVisitorAdapter {
+        class ReciprocalExpressionVisitor extends OWLClassExpressionVisitorAdapter {
 
             private boolean recip;
 
-            public boolean isReciprocal(OWLDescription descr){
+            public boolean isReciprocal(OWLClassExpression descr){
                 recip = false;
                 descr.accept(this);
                 return recip;
             }
 
 
-            public void visit(OWLObjectSomeRestriction restriction) {
+            public void visit(OWLObjectSomeValuesFrom restriction) {
                 if (followProperty(restriction.getProperty()) &&
                     restriction.getFiller().equals(cls)){ // @@TODO fillers in intersections?
                     recip = true;
@@ -170,7 +170,7 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
             }
 
 
-            public void visit(OWLObjectMinCardinalityRestriction restriction) {
+            public void visit(OWLObjectMinCardinality restriction) {
                 if (restriction.getCardinality() > 0 &&
                     followProperty(restriction.getProperty()) &&
                     restriction.getFiller().equals(cls)){ // @@TODO fillers in intersections?
@@ -179,7 +179,7 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
             }
 
 
-            public void visit(OWLObjectExactCardinalityRestriction restriction) {
+            public void visit(OWLObjectExactCardinality restriction) {
                 if (restriction.getCardinality() > 0 &&
                     followProperty(restriction.getProperty()) &&
                     restriction.getFiller().equals(cls)){ // @@TODO fillers in intersections?

@@ -1,7 +1,7 @@
 package org.coode.outlinetree.model;
 
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owlapi.model.*;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -165,7 +165,7 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
 
     public <T extends OutlineNode> T createNode(OWLObject object, OutlineNode parent) {
         T node;
-        if (object instanceof OWLConstant ||
+        if (object instanceof OWLLiteral ||
                 object instanceof OWLDataRange ||
                 object instanceof OWLIndividual){
             node = (T)new OutlineLeafNode(object, this);
@@ -177,7 +177,7 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
             node = (T)new OWLClassNode((OWLClass)object, this);
         }
         else {
-            node = (T)new OWLDescriptionNode((OWLDescription)object, this);
+            node = (T)new OWLClassExpressionNode((OWLClassExpression)object, this);
         }
         node.setParent(parent);
         return node;
@@ -189,26 +189,26 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
         final OWLDataFactory df = mngr.getOWLDataFactory();
 
         if (parent instanceof OWLPropertyNode && child instanceof OWLClassNode){
-            OWLDescription cls = ((OWLPropertyNode)parent).getParent().getUserObject();
+            OWLClassExpression cls = ((OWLPropertyNode)parent).getParent().getUserObject();
             OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)parent).getRenderedObject();
-            OWLDescription filler = ((OWLClassNode)child).getUserObject();
-            OWLDescription restr = df.getOWLObjectSomeRestriction(p, filler);
+            OWLClassExpression filler = ((OWLClassNode)child).getUserObject();
+            OWLClassExpression restr = df.getOWLObjectSomeValuesFrom(p, filler);
 
             // if it exists, overwrite the default p some Thing with the more specific restriction
-            OWLObjectSomeRestriction pSomeThing = df.getOWLObjectSomeRestriction(p, df.getOWLThing());
-            OWLAxiom clsSubPSomeThing = df.getOWLSubClassAxiom(cls, pSomeThing);
+            OWLObjectSomeValuesFrom pSomeThing = df.getOWLObjectSomeValuesFrom(p, df.getOWLThing());
+            OWLAxiom clsSubPSomeThing = df.getOWLSubClassOfAxiom(cls, pSomeThing);
             if (ont.containsAxiom(clsSubPSomeThing)){
                 changes.add(new RemoveAxiom(ont, clsSubPSomeThing));
             }
 
-            changes.add(new AddAxiom(ont, df.getOWLSubClassAxiom(cls, restr)));
+            changes.add(new AddAxiom(ont, df.getOWLSubClassOfAxiom(cls, restr)));
         }
         else if (parent instanceof OWLClassNode && child instanceof OWLPropertyNode){
             // "adding a property to a class" = adding subClassOf(cls, someValuesFrom(p, owlThing))
-            OWLDescription cls = ((OWLClassNode)parent).getUserObject();
+            OWLClassExpression cls = ((OWLClassNode)parent).getUserObject();
             OWLObjectProperty p = (OWLObjectProperty)((OWLPropertyNode)child).getRenderedObject();
-            OWLDescription restr = df.getOWLObjectSomeRestriction(p, df.getOWLThing());
-            changes.add(new AddAxiom(ont, df.getOWLSubClassAxiom(cls, restr)));
+            OWLClassExpression restr = df.getOWLObjectSomeValuesFrom(p, df.getOWLThing());
+            changes.add(new AddAxiom(ont, df.getOWLSubClassOfAxiom(cls, restr)));
         }
         
         return changes;
@@ -248,11 +248,11 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
 
 
     private boolean isSubjectOfAxiom(OWLObject owlObject, OWLAxiom ax) {
-        if (ax instanceof OWLSubClassAxiom){
-            return ((OWLSubClassAxiom)ax).getSubClass().equals(owlObject);
+        if (ax instanceof OWLSubClassOfAxiom){
+            return ((OWLSubClassOfAxiom)ax).getSubClass().equals(owlObject);
         }
         else if (ax instanceof OWLEquivalentClassesAxiom){
-            return ((OWLEquivalentClassesAxiom)ax).getDescriptions().contains(owlObject);
+            return ((OWLEquivalentClassesAxiom)ax).getClassExpressions().contains(owlObject);
         }
         return false;
     }

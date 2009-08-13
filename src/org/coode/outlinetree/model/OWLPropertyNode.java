@@ -2,7 +2,7 @@ package org.coode.outlinetree.model;
 
 import org.coode.outlinetree.util.AbstractExistentialFinder;
 import org.coode.outlinetree.util.OutlineRestrictionVisitor;
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owlapi.model.*;
 
 import java.util.*;
 /*
@@ -64,7 +64,7 @@ import java.util.*;
  * Each property node is therefore a collection:
  * Multiple objects that relate a single description or individual to multiple fillers or individuals
  */
-class OWLPropertyNode extends AbstractOutlineNode<Set<OWLRestriction>/*OWLPropertyExpression*/, OutlineNode<OWLDescription, OutlineNode>> {
+class OWLPropertyNode extends AbstractOutlineNode<Set<OWLRestriction>/*OWLPropertyExpression*/, OutlineNode<OWLClassExpression, OutlineNode>> {
 
     private OWLPropertyExpression property;
     private List<OutlineNode> orderedChildren;
@@ -183,7 +183,7 @@ class OWLPropertyNode extends AbstractOutlineNode<Set<OWLRestriction>/*OWLProper
         }
 
 
-        public void visit(OWLDataValueRestriction restriction) {
+        public void visit(OWLDataHasValue restriction) {
             if (restriction.getProperty().equals(property)){
                 OutlineNode child = getModel().createNode(restriction.getValue(), OWLPropertyNode.this);
                 child.addAxioms(getAxiomsForRestriction(restriction));
@@ -192,7 +192,7 @@ class OWLPropertyNode extends AbstractOutlineNode<Set<OWLRestriction>/*OWLProper
         }
 
 
-        public void visit(OWLObjectValueRestriction restriction) {
+        public void visit(OWLObjectHasValue restriction) {
             if (restriction.getProperty().equals(property)){
                 OutlineNode child = getModel().createNode(restriction.getValue(), OWLPropertyNode.this);
                 child.addAxioms(getAxiomsForRestriction(restriction));

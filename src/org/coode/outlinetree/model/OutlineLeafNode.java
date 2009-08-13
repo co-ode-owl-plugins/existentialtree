@@ -1,6 +1,6 @@
 package org.coode.outlinetree.model;
 
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObject;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,11 +1,10 @@
 package org.coode.existentialtree.model;
 
 import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.semanticweb.owl.model.OWLIndividual;
-import org.semanticweb.owl.model.OWLObjectProperty;
-import org.semanticweb.owl.model.OWLObjectPropertyExpression;
-import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+import org.semanticweb.owlapi.model.OWLOntology;
 
 import java.util.*;
 /*
@@ -45,14 +44,15 @@ public class OWLRelationHierarchyProvider extends AbstractHierarchyProvider<OWLI
 
     private OWLIndividual root;
 
-    private OWLObjectHierarchyProvider<OWLObjectProperty> hp;
-
     private Set<OWLObjectProperty> propAndDescendants = new HashSet<OWLObjectProperty>();
 
-    public OWLRelationHierarchyProvider(OWLModelManager owlOntologyManager) {
-        super(owlOntologyManager.getOWLOntologyManager());
-        ontologies = owlOntologyManager.getOntologies();
-        hp = owlOntologyManager.getOWLObjectPropertyHierarchyProvider();
+    private OWLModelManager mngr;
+
+
+    public OWLRelationHierarchyProvider(OWLModelManager mngr) {
+        super(mngr.getOWLOntologyManager());
+        this.mngr = mngr;
+        ontologies = mngr.getOntologies();
     }
 
     public void setOntologies(Set<OWLOntology> ontologies) {
@@ -71,7 +71,11 @@ public class OWLRelationHierarchyProvider extends AbstractHierarchyProvider<OWLI
     public Set<OWLIndividual> getChildren(OWLIndividual individual) {
         Map<OWLObjectPropertyExpression, Set<OWLIndividual>> values = new HashMap<OWLObjectPropertyExpression, Set<OWLIndividual>>();
         for (OWLOntology ont : ontologies){
-             values.putAll(individual.getObjectPropertyValues(ont));
+            final Map<OWLObjectPropertyExpression, Set<OWLIndividual>> p = individual.getObjectPropertyValues(ont);
+            if (p.size() > 0){
+                System.out.println(individual + " = " + p.keySet());
+            }
+            values.putAll(p);
         }
 
         Set<OWLIndividual> children = new HashSet<OWLIndividual>();
@@ -103,7 +107,7 @@ public class OWLRelationHierarchyProvider extends AbstractHierarchyProvider<OWLI
     public void setProp(OWLObjectProperty prop){
         propAndDescendants.clear();
         if (prop != null){
-            propAndDescendants.addAll(hp.getDescendants(prop));
+            propAndDescendants.addAll(mngr.getOWLHierarchyManager().getOWLObjectPropertyHierarchyProvider().getDescendants(prop));
             propAndDescendants.add(prop);
         }
     }

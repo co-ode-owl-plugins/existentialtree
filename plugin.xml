@@ -4,7 +4,7 @@
 
     <extension id="ExistentialTreeView2"
                point="org.protege.editor.core.application.ViewComponent">
-        <label value="Outline Tree"/>
+        <label value="Outline tree"/>
         <class value="org.coode.outlinetree.ui.OutlineView"/>
         <headerColor value="@org.protege.classcolor"/>
         <category value="@org.protege.classcategory"/>
@@ -12,7 +12,7 @@
 
     <extension id="TextOutlineView"
                point="org.protege.editor.core.application.ViewComponent">
-        <label value="Text Outline Tree"/>
+        <label value="Outline tree (text)"/>
         <class value="org.coode.outlinetree.ui.TextOutlineView"/>
         <headerColor value="@org.protege.classcolor"/>
         <category value="@org.protege.classcategory"/>
@@ -20,28 +20,26 @@
 
     <extension id="ExistentialTreeView"
                point="org.protege.editor.core.application.ViewComponent">
-        <label value="Existential Tree"/>
+        <label value="Existential tree"/>
         <class value="org.coode.existentialtree.view.ExistentialTreeView"/>
         <headerColor value="@org.protege.classcolor"/>
         <category value="@org.protege.classcategory"/>
     </extension>
 
-    <extension id="RelationsTreeView"
-     		   point="org.protege.editor.core.application.ViewComponent">
-        <label value="Relations Tree"/>
-        <class value="org.coode.existentialtree.view.RelationsTreeView"/>
-        <headerColor value="@org.protege.individualcolor"/>
-        <category value="@org.protege.individualcategory"/>
-    </extension>
-
-
     <extension id="ReciprocalsTreeView"
                point="org.protege.editor.core.application.ViewComponent">
-        <label value="Reverse Existential Tree"/>
+        <label value="Existential tree (reversed)"/>
         <class value="org.coode.existentialtree.view.ReciprocalsTreeView"/>
         <headerColor value="@org.protege.classcolor"/>
         <category value="@org.protege.classcategory"/>
     </extension>
 
+    <!--extension id="RelationsTreeView"
+     		   point="org.protege.editor.core.application.ViewComponent">
+        <label value="Relations Tree"/>
+        <class value="org.coode.existentialtree.view.RelationsTreeView"/>
+        <headerColor value="@org.protege.individualcolor"/>
+        <category value="@org.protege.individualcategory"/>
+    </extension-->
 
 </plugin>

@@ -3,8 +3,8 @@ package org.coode.outlinetree.test;
 import junit.framework.TestCase;
 import org.coode.outlinetree.model.OutlineNode;
 import org.coode.outlinetree.model.OutlineTreeModel;
-import org.semanticweb.owl.apibinding.OWLManager;
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.*;
 
 import java.net.URI;
 import java.util.*;
@@ -59,7 +59,7 @@ import java.util.*;
  */
 public class OutlineViewTestCase extends TestCase {
 
-    private static final URI ONTOLOGY_URI = URI.create("http://www.co-ode.org/ontologies/test/outlineview.owl");
+    private static final IRI ONTOLOGY_IRI = IRI.create("http://www.co-ode.org/ontologies/test/outlineview.owl");
 
     private OWLOntologyManager mngr;
     private OWLOntology ont;
@@ -73,37 +73,37 @@ public class OutlineViewTestCase extends TestCase {
     private OWLObjectProperty q;
     private OWLObjectProperty r;
 
-    private OWLSubClassAxiom aPSomeB;
-    private OWLSubClassAxiom aPSomeC;
-    private OWLSubClassAxiom aQSomeD;
+    private OWLSubClassOfAxiom aPSomeB;
+    private OWLSubClassOfAxiom aPSomeC;
+    private OWLSubClassOfAxiom aQSomeD;
 
     private OWLObjectIntersectionOf cAndRSomeE;
 
     public void init(){
         try {
             mngr = OWLManager.createOWLOntologyManager();
-            ont = mngr.createOntology(ONTOLOGY_URI);
+            ont = mngr.createOntology(ONTOLOGY_IRI);
 
             final OWLDataFactory df = mngr.getOWLDataFactory();
 
-            a = df.getOWLClass(URI.create(ONTOLOGY_URI + "#A"));
-            b = df.getOWLClass(URI.create(ONTOLOGY_URI + "#B"));
-            c = df.getOWLClass(URI.create(ONTOLOGY_URI + "#C"));
-            d = df.getOWLClass(URI.create(ONTOLOGY_URI + "#D"));
-            e = df.getOWLClass(URI.create(ONTOLOGY_URI + "#E"));
+            a = df.getOWLClass(URI.create(ONTOLOGY_IRI + "#A"));
+            b = df.getOWLClass(URI.create(ONTOLOGY_IRI + "#B"));
+            c = df.getOWLClass(URI.create(ONTOLOGY_IRI + "#C"));
+            d = df.getOWLClass(URI.create(ONTOLOGY_IRI + "#D"));
+            e = df.getOWLClass(URI.create(ONTOLOGY_IRI + "#E"));
 
-            p = df.getOWLObjectProperty(URI.create(ONTOLOGY_URI + "#p"));
-            q = df.getOWLObjectProperty(URI.create(ONTOLOGY_URI + "#q"));
-            r = df.getOWLObjectProperty(URI.create(ONTOLOGY_URI + "#r"));
+            p = df.getOWLObjectProperty(URI.create(ONTOLOGY_IRI + "#p"));
+            q = df.getOWLObjectProperty(URI.create(ONTOLOGY_IRI + "#q"));
+            r = df.getOWLObjectProperty(URI.create(ONTOLOGY_IRI + "#r"));
 
             // build the axioms and descriptions
-            aPSomeB = df.getOWLSubClassAxiom(a, df.getOWLObjectSomeRestriction(p, b));
-            aPSomeC = df.getOWLSubClassAxiom(a, df.getOWLObjectSomeRestriction(p, cAndRSomeE));
-            aQSomeD = df.getOWLSubClassAxiom(a, df.getOWLObjectSomeRestriction(q, d));
+            aPSomeB = df.getOWLSubClassOfAxiom(a, df.getOWLObjectSomeValuesFrom(p, b));
+            aPSomeC = df.getOWLSubClassOfAxiom(a, df.getOWLObjectSomeValuesFrom(p, cAndRSomeE));
+            aQSomeD = df.getOWLSubClassOfAxiom(a, df.getOWLObjectSomeValuesFrom(q, d));
 
-            Set<OWLDescription> and = new HashSet<OWLDescription>();
+            Set<OWLClassExpression> and = new HashSet<OWLClassExpression>();
             and.add(c);
-            and.add(df.getOWLObjectSomeRestriction(r, e));
+            and.add(df.getOWLObjectSomeValuesFrom(r, e));
             cAndRSomeE = df.getOWLObjectIntersectionOf(and);
 
             // build the test ontology

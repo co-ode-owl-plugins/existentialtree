@@ -1,14 +1,14 @@
 package org.coode.existentialtree.view;
 
 import org.coode.existentialtree.model.AbstractHierarchyProvider;
-import org.coode.existentialtree.ui.AbstractOWLDescriptionHierarchyViewComponent;
+import org.coode.existentialtree.ui.AbstractOWLClassExpressionHierarchyViewComponent;
 import org.protege.editor.core.ui.view.DisposableAction;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.protege.editor.owl.ui.OWLIcons;
 import org.protege.editor.owl.ui.UIHelper;
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owlapi.model.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
@@ -44,7 +44,7 @@ import java.awt.event.HierarchyListener;
  * Bio Health Informatics Group<br>
  * Date: Oct 29, 2007<br><br>
  */
-public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLDescriptionHierarchyViewComponent {
+public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLClassExpressionHierarchyViewComponent {
 
     private static final String ALL_PROPERTIES = "all properties";
 

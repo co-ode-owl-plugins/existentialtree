@@ -1,6 +1,6 @@
 package org.coode.outlinetree.model;
 
-import org.semanticweb.owl.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLAxiom;
 
 import java.util.ArrayList;
 import java.util.HashSet;

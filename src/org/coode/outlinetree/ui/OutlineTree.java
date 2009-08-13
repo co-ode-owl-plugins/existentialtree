@@ -3,7 +3,7 @@ package org.coode.outlinetree.ui;
 import org.coode.outlinetree.model.OutlineNode;
 import org.coode.outlinetree.model.OutlineTreeModel;
 import org.protege.editor.owl.OWLEditorKit;
-import org.semanticweb.owl.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLAxiom;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;

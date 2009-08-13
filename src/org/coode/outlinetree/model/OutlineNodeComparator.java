@@ -1,7 +1,7 @@
 package org.coode.outlinetree.model;
 
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObject;
 
 import java.util.Comparator;
 /*

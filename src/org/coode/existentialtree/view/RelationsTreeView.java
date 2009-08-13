@@ -32,6 +32,8 @@ import org.coode.existentialtree.model.OWLRelationHierarchyProvider;
  * The University Of Manchester<br>
  * Bio Health Informatics Group<br>
  * Date: Sep 13, 2007<br><br>
+ *
+ * This currently does not work - it should not extend AbstractOWLClassExpressionHierarchyViewComponent
  */
 public class RelationsTreeView extends AbstractTreeView {
 

@@ -1,8 +1,6 @@
 package org.coode.outlinetree.ui;
 
 import org.coode.outlinetree.model.OutlineNode;
-import org.protege.editor.owl.ui.renderer.OWLObjectRenderer;
-import org.protege.editor.owl.ui.renderer.OWLObjectRendererImpl;
 
 import javax.swing.*;
 import javax.swing.event.TreeModelEvent;
@@ -47,8 +45,6 @@ public class TextOutlineView extends AbstractOutlineView {
 
     private Set<OutlineNode> renderedNodes = new HashSet<OutlineNode>();
 
-    private OWLObjectRenderer objRen;
-
     public int indent = 0;
 
     private TreeModelListener treeModelListener = new TreeModelListener(){
@@ -89,18 +85,6 @@ public class TextOutlineView extends AbstractOutlineView {
         renderedNodes.clear();
 
         OutlineNode root = model.getRoot();
-        objRen = new OWLObjectRendererImpl(getOWLModelManager()){
-
-            protected void insertIndent(int indent) {
-                for(int i=0; i<indent; i++){
-                    write("\t");
-                }
-            }
-
-            protected int getIndent() {
-                return indent;
-            }
-        };
         renderNode(root, indent);
     }
 
@@ -110,7 +94,7 @@ public class TextOutlineView extends AbstractOutlineView {
             str += "\t";
         }
 
-        str += objRen.render(node.getRenderedObject(), null);
+        str += getOWLModelManager().getRendering(node.getRenderedObject());
         str += "\n";
 
         editor.append(str);

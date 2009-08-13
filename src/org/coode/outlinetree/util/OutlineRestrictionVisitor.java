@@ -1,6 +1,6 @@
 package org.coode.outlinetree.util;
 
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owlapi.model.*;
 
 import java.util.Set;
 /*
@@ -47,12 +47,12 @@ public abstract class OutlineRestrictionVisitor extends AbstractExistentialFinde
     }
 
 
-    public void visit(OWLDataValueRestriction restriction) {
+    public void visit(OWLDataHasValue restriction) {
         handleRestriction(restriction);
     }
 
 
-    public void visit(OWLObjectValueRestriction restriction) {
+    public void visit(OWLObjectHasValue restriction) {
         handleRestriction(restriction);
     }
 
