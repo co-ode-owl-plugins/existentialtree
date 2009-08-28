@@ -5,10 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.coode.outlinetree.model.OutlineNode;
 import org.coode.outlinetree.model.OutlineTreeModel;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.*;
 
 import java.net.URI;
 /*
@@ -159,16 +156,16 @@ public class TestExistentialModel extends TestCase {
     }
     
     private OWLClass getNamedClass(String name) {
-        URI uri = URI.create(PIZZA_NS + name);
-        OWLClass cls = mngr.getOWLDataFactory().getOWLClass(uri);
-        assertTrue(ont.containsClassReference(uri));
+        IRI iri = IRI.create(PIZZA_NS + name);
+        OWLClass cls = mngr.getOWLDataFactory().getOWLClass(iri);
+        assertTrue(ont.containsClassReference(iri));
         return cls;
     }
 
     private OWLObjectProperty getNamedProperty(String name) {
-        URI uri = URI.create(PIZZA_NS + name);
-        OWLObjectProperty property = mngr.getOWLDataFactory().getOWLObjectProperty(uri);
-        assertTrue(ont.containsObjectPropertyReference(uri));
+        IRI iri = IRI.create(PIZZA_NS + name);
+        OWLObjectProperty property = mngr.getOWLDataFactory().getOWLObjectProperty(iri);
+        assertTrue(ont.containsObjectPropertyReference(iri));
         return property;
     }
 }
