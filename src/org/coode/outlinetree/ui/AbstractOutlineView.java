@@ -1,54 +1,43 @@
 package org.coode.outlinetree.ui;
 
-import org.coode.outlinetree.OutlineTreePreferences;
-import org.coode.outlinetree.model.OutlineNode;
-import org.coode.outlinetree.model.OutlineNodeComparator;
-import org.coode.outlinetree.model.OutlineTreeModel;
-import org.protege.editor.core.ProtegeApplication;
-import org.protege.editor.core.ui.view.DisposableAction;
-import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
-import org.protege.editor.owl.model.event.OWLModelManagerListener;
-import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.protege.editor.owl.model.inference.NoOpReasoner;
-import org.protege.editor.owl.ui.OWLIcons;
-import org.protege.editor.owl.ui.UIHelper;
-import org.protege.editor.owl.ui.selector.OWLDataPropertySelectorPanel;
-import org.protege.editor.owl.ui.selector.OWLObjectPropertySelectorPanel;
-import org.protege.editor.owl.ui.view.cls.AbstractOWLClassViewComponent;
-import org.semanticweb.owlapi.inference.OWLReasonerException;
-import org.semanticweb.owlapi.model.*;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.HashSet;
 import java.util.Set;
-/*
-* Copyright (C) 2007, University of Manchester
-*
-* Modifications to the initial code base are copyright of their
-* respective authors, or their employers as appropriate.  Authorship
-* of the modifications may be determined from the ChangeLog placed at
-* the end of this file.
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
 
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
+import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.JToolBar;
 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+import org.coode.outlinetree.OutlineTreePreferences;
+import org.coode.outlinetree.model.OutlineNode;
+import org.coode.outlinetree.model.OutlineNodeComparator;
+import org.coode.outlinetree.model.OutlineTreeModel;
+import org.protege.editor.core.ui.view.DisposableAction;
+import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
+import org.protege.editor.owl.model.event.OWLModelManagerListener;
+import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
+import org.protege.editor.owl.ui.OWLIcons;
+import org.protege.editor.owl.ui.UIHelper;
+import org.protege.editor.owl.ui.selector.OWLDataPropertySelectorPanel;
+import org.protege.editor.owl.ui.selector.OWLObjectPropertySelectorPanel;
+import org.protege.editor.owl.ui.view.cls.AbstractOWLClassViewComponent;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
+import org.semanticweb.owlapi.model.OWLProperty;
+import org.semanticweb.owlapi.model.OWLPropertyExpression;
 
 /**
  * Author: drummond<br>
@@ -245,13 +234,8 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
 
     private OWLObjectHierarchyProvider<OWLClass> getHierarchyProvider() {
         OWLModelManager mngr = getOWLModelManager();
-        try {
-            if (!(mngr.getReasoner() instanceof NoOpReasoner) && mngr.getReasoner().isClassified()){
-                return mngr.getOWLHierarchyManager().getInferredOWLClassHierarchyProvider();
-            }
-        }
-        catch (OWLReasonerException e) {
-            ProtegeApplication.getErrorLog().handleError(Thread.currentThread(), e);
+        if (mngr.getOWLReasonerManager().isClassified()){
+            return mngr.getOWLHierarchyManager().getInferredOWLClassHierarchyProvider();
         }
         return mngr.getOWLHierarchyManager().getOWLClassHierarchyProvider();
     }
