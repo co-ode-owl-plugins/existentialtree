@@ -102,7 +102,7 @@ public class ObjectPropertyCombo extends JComboBox {
     private void load() {
         Set<OWLProperty> props = new HashSet<OWLProperty>();
         for (OWLOntology ont: mngr.getOWLOntologyManager().getImportsClosure(mngr.getActiveOntology())){
-            props.addAll(ont.getReferencedObjectProperties());
+            props.addAll(ont.getObjectPropertiesInSignature());
         }
         ArrayList<OWLProperty> orderedProps = new ArrayList<OWLProperty>(props);
         Collections.sort(orderedProps, mngr.getOWLObjectComparator());

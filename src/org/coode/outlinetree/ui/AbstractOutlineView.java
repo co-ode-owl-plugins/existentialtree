@@ -372,7 +372,7 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
     private Set<OWLObjectProperty> getAllObjectProperties() {
         Set<OWLObjectProperty> props = new HashSet<OWLObjectProperty>();
         for (OWLOntology ont : model.getOntologies()){
-            props.addAll(ont.getReferencedObjectProperties());
+            props.addAll(ont.getObjectPropertiesInSignature());
         }
         return props;
     }
@@ -381,7 +381,7 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         private Set<OWLDataProperty> getAllDataProperties() {
         Set<OWLDataProperty> props = new HashSet<OWLDataProperty>();
         for (OWLOntology ont : model.getOntologies()){
-            props.addAll(ont.getReferencedDataProperties());
+            props.addAll(ont.getDataPropertiesInSignature());
         }
         return props;
     }
