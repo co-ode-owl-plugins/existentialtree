@@ -6,7 +6,6 @@ import org.coode.outlinetree.model.OutlineTreeModel;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 
-import java.net.URI;
 import java.util.*;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -86,15 +85,15 @@ public class OutlineViewTestCase extends TestCase {
 
             final OWLDataFactory df = mngr.getOWLDataFactory();
 
-            a = df.getOWLClass(URI.create(ONTOLOGY_IRI + "#A"));
-            b = df.getOWLClass(URI.create(ONTOLOGY_IRI + "#B"));
-            c = df.getOWLClass(URI.create(ONTOLOGY_IRI + "#C"));
-            d = df.getOWLClass(URI.create(ONTOLOGY_IRI + "#D"));
-            e = df.getOWLClass(URI.create(ONTOLOGY_IRI + "#E"));
+            a = df.getOWLClass(IRI.create(ONTOLOGY_IRI + "#A"));
+            b = df.getOWLClass(IRI.create(ONTOLOGY_IRI + "#B"));
+            c = df.getOWLClass(IRI.create(ONTOLOGY_IRI + "#C"));
+            d = df.getOWLClass(IRI.create(ONTOLOGY_IRI + "#D"));
+            e = df.getOWLClass(IRI.create(ONTOLOGY_IRI + "#E"));
 
-            p = df.getOWLObjectProperty(URI.create(ONTOLOGY_IRI + "#p"));
-            q = df.getOWLObjectProperty(URI.create(ONTOLOGY_IRI + "#q"));
-            r = df.getOWLObjectProperty(URI.create(ONTOLOGY_IRI + "#r"));
+            p = df.getOWLObjectProperty(IRI.create(ONTOLOGY_IRI + "#p"));
+            q = df.getOWLObjectProperty(IRI.create(ONTOLOGY_IRI + "#q"));
+            r = df.getOWLObjectProperty(IRI.create(ONTOLOGY_IRI + "#r"));
 
             // build the axioms and descriptions
             aPSomeB = df.getOWLSubClassOfAxiom(a, df.getOWLObjectSomeValuesFrom(p, b));

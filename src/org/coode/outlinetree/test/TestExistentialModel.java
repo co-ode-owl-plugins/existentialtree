@@ -6,8 +6,6 @@ import org.coode.outlinetree.model.OutlineNode;
 import org.coode.outlinetree.model.OutlineTreeModel;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
-
-import java.net.URI;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -146,7 +144,7 @@ public class TestExistentialModel extends TestCase {
         if (mngr == null){
             mngr = OWLManager.createOWLOntologyManager();
             try {
-                ont = mngr.loadOntologyFromPhysicalURI(getClass().getResource("pizza.owl").toURI());
+                ont = mngr.loadOntologyFromOntologyDocument(IRI.create(getClass().getResource("pizza.owl").toURI()));
             }
             catch (Exception e) {
                 e.printStackTrace();
@@ -158,14 +156,14 @@ public class TestExistentialModel extends TestCase {
     private OWLClass getNamedClass(String name) {
         IRI iri = IRI.create(PIZZA_NS + name);
         OWLClass cls = mngr.getOWLDataFactory().getOWLClass(iri);
-        assertTrue(ont.containsClassReference(iri));
+        assertTrue(ont.containsClassInSignature(iri));
         return cls;
     }
 
     private OWLObjectProperty getNamedProperty(String name) {
         IRI iri = IRI.create(PIZZA_NS + name);
         OWLObjectProperty property = mngr.getOWLDataFactory().getOWLObjectProperty(iri);
-        assertTrue(ont.containsObjectPropertyReference(iri));
+        assertTrue(ont.containsObjectPropertyInSignature(iri));
         return property;
     }
 }
