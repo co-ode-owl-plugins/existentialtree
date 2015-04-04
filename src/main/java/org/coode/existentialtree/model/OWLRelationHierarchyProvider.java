@@ -1,12 +1,5 @@
 package org.coode.existentialtree.model;
 
-import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owlapi.model.OWLIndividual;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
-import org.semanticweb.owlapi.model.OWLOntology;
-
-import java.util.*;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -29,6 +22,18 @@ import java.util.*;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.search.EntitySearcher;
+
+import com.google.common.collect.Multimap;
 
 /**
  * Author: Nick Drummond<br>
@@ -69,14 +74,7 @@ public class OWLRelationHierarchyProvider extends AbstractHierarchyProvider<OWLI
     }
 
     public Set<OWLIndividual> getChildren(OWLIndividual individual) {
-        Map<OWLObjectPropertyExpression, Set<OWLIndividual>> values = new HashMap<OWLObjectPropertyExpression, Set<OWLIndividual>>();
-        for (OWLOntology ont : ontologies){
-            final Map<OWLObjectPropertyExpression, Set<OWLIndividual>> p = individual.getObjectPropertyValues(ont);
-            if (p.size() > 0){
-                System.out.println(individual + " = " + p.keySet());
-            }
-            values.putAll(p);
-        }
+        Multimap<OWLObjectPropertyExpression, OWLIndividual> values = EntitySearcher.getObjectPropertyValues(individual,ontologies);
 
         Set<OWLIndividual> children = new HashSet<OWLIndividual>();
 

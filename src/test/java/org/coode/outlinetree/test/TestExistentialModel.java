@@ -1,11 +1,8 @@
 package org.coode.outlinetree.test;
 
-import junit.framework.TestCase;
-import org.apache.commons.lang.StringUtils;
 import org.coode.outlinetree.model.OutlineNode;
 import org.coode.outlinetree.model.OutlineTreeModel;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.*;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -28,6 +25,13 @@ import org.semanticweb.owlapi.model.*;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+
+import junit.framework.TestCase;
 
 /**
  * Author: Nick Drummond<br>
@@ -124,7 +128,7 @@ public class TestExistentialModel extends TestCase {
         indent++;
         for (int i=0; i<model.getChildCount(start); i++){
             OutlineNode child = model.getChild(start, i);
-            System.out.println(StringUtils.leftPad("+ " + child, indent*2));
+            System.out.println(leftPad("+ " + child, indent*2));
             Object obj = child.getUserObject();
             if (obj.equals(namedClass)){
                 return child;
@@ -138,6 +142,13 @@ public class TestExistentialModel extends TestCase {
         }
         indent--;
         return null;
+    }
+    private String leftPad(String s, int spaces) {
+        StringBuilder b=new StringBuilder(s);
+        for(int i=0; i<spaces;i++) {
+            b.append(' ');
+        }
+        return b.toString();
     }
 
     private void init(){

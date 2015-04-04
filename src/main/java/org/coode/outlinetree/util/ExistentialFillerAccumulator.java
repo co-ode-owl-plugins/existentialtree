@@ -1,10 +1,18 @@
 package org.coode.outlinetree.util;
 
-import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owlapi.util.OWLClassExpressionVisitorAdapter;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLObjectExactCardinality;
+import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
+import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.search.EntitySearcher;
+import org.semanticweb.owlapi.util.OWLClassExpressionVisitorAdapter;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -57,14 +65,12 @@ public class ExistentialFillerAccumulator extends OWLClassExpressionVisitorAdapt
         fillers.clear();
         onts = ontologies;
         if (cls instanceof OWLClass){
-            for (OWLOntology ont : ontologies){
-                for (OWLClassExpression restr : ((OWLClass)cls).getSuperClasses(ont)) {
+                for (OWLClassExpression restr : EntitySearcher.getSubClasses((OWLClass)cls, ontologies)) {
                     restr.accept(this);
                 }
-                for (OWLClassExpression restr : ((OWLClass)cls).getEquivalentClasses(ont)) {
+                for (OWLClassExpression restr : EntitySearcher.getEquivalentClasses((OWLClass)cls, ontologies)) {
                     restr.accept(this);
                 }
-            }
         }
         else{
             cls.accept(this);
