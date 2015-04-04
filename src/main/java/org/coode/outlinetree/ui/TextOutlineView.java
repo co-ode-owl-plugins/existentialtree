@@ -1,10 +1,5 @@
 package org.coode.outlinetree.ui;
 
-import org.coode.outlinetree.model.OutlineNode;
-
-import javax.swing.*;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +26,13 @@ import java.util.Set;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+
+import org.coode.outlinetree.model.OutlineNode;
+
 /**
  * Author: drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -40,6 +42,7 @@ import java.util.Set;
  * Date: Mar 19, 2008<br><br>
  */
 public class TextOutlineView extends AbstractOutlineView {
+    private static final long serialVersionUID = 1L;
 
     private JTextArea editor;
 
@@ -66,10 +69,12 @@ public class TextOutlineView extends AbstractOutlineView {
         }
     };
 
-    public void initialiseClassView() throws Exception {
+    @Override
+    public void initialiseClassView() {
         super.initialiseClassView();
     }
 
+    @Override
     protected void refreshGUI() {
         model.addTreeModelListener(treeModelListener);
         

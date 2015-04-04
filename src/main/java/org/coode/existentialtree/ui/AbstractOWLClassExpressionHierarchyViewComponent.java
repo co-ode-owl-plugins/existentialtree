@@ -1,19 +1,6 @@
 package org.coode.existentialtree.ui;
 
-import org.protege.editor.core.ui.util.ComponentFactory;
-import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.protege.editor.owl.ui.tree.OWLModelManagerTree;
-import org.protege.editor.owl.ui.tree.OWLObjectTree;
-import org.protege.editor.owl.ui.tree.OWLObjectTreeCellRenderer;
-import org.protege.editor.owl.ui.view.Findable;
-import org.protege.editor.owl.ui.view.cls.AbstractOWLClassViewComponent;
-import org.semanticweb.owlapi.model.*;
-
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -40,6 +27,24 @@ import java.util.ArrayList;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+
+import org.protege.editor.core.ui.util.ComponentFactory;
+import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
+import org.protege.editor.owl.ui.tree.OWLModelManagerTree;
+import org.protege.editor.owl.ui.tree.OWLObjectTree;
+import org.protege.editor.owl.ui.tree.OWLObjectTreeCellRenderer;
+import org.protege.editor.owl.ui.view.Findable;
+import org.protege.editor.owl.ui.view.cls.AbstractOWLClassViewComponent;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
+
 /**
  * Author: Nick Drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -53,17 +58,22 @@ import java.util.ArrayList;
  */
 public abstract class AbstractOWLClassExpressionHierarchyViewComponent extends AbstractOWLClassViewComponent
         implements Findable<OWLClass> { //, Deleteable {
+    private static final long serialVersionUID = 1L;
 
     private OWLModelManagerTree<OWLClassExpression> tree;
 
     private TreeSelectionListener listener;
 
+    @Override
     final public void initialiseClassView() throws Exception {
 
         setLayout(new BorderLayout(7, 7));
 
         tree = new OWLModelManagerTree<OWLClassExpression>(getOWLEditorKit(),
                                                            getHierarchyProvider()){
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public String getToolTipText(MouseEvent event) {
                 OWLObject obj = getOWLObjectAtMousePosition(event);
                 if (obj == null){
@@ -80,6 +90,7 @@ public abstract class AbstractOWLClassExpressionHierarchyViewComponent extends A
 
         tree.setCellRenderer(new OWLObjectTreeCellRenderer(getOWLEditorKit()){
 
+            @Override
             protected String getRendering(Object object) {
                 if (object instanceof OWLObjectIntersectionOf){
                     for (OWLClassExpression op : ((OWLObjectIntersectionOf)object).getOperands()){
@@ -123,13 +134,14 @@ public abstract class AbstractOWLClassExpressionHierarchyViewComponent extends A
             }
         });
         tree.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseReleased(MouseEvent e) {
                 transmitSelection();
             }
         });
     }
 
-    private void ensureSelection() {
+    protected void ensureSelection() {
         OWLClass cls = getSelectedOWLClass();
         if (cls != null) {
             OWLClassExpression treeSel = tree.getSelectedOWLObject();
@@ -140,6 +152,7 @@ public abstract class AbstractOWLClassExpressionHierarchyViewComponent extends A
     }
 
 
+    @Override
     public boolean requestFocusInWindow() {
         return tree.requestFocusInWindow();
     }
@@ -181,6 +194,7 @@ public abstract class AbstractOWLClassExpressionHierarchyViewComponent extends A
     }
 
 
+    @Override
     protected OWLClass updateView(OWLClass selectedClass) {
         if (tree.getSelectedOWLObject() == null) {
             if (selectedClass != null) {
@@ -203,6 +217,7 @@ public abstract class AbstractOWLClassExpressionHierarchyViewComponent extends A
     protected abstract OWLObjectHierarchyProvider<OWLClassExpression> getHierarchyProvider();
 
 
+    @Override
     public void disposeView() {
         // Dispose of the tree selection listener
         if (tree != null) {
@@ -212,6 +227,7 @@ public abstract class AbstractOWLClassExpressionHierarchyViewComponent extends A
     }
 
 
+    @Override
     protected OWLObject getObjectToCopy() {
         return tree.getSelectedOWLObject();
     }

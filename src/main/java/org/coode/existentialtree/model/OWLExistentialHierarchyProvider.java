@@ -1,15 +1,15 @@
 package org.coode.existentialtree.model;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.coode.outlinetree.util.ExistentialFillerAccumulator;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -84,10 +84,12 @@ public class OWLExistentialHierarchyProvider extends AbstractHierarchyProvider<O
         return object.equals(root);
     }
 
+    @Override
     public void setRoot(OWLClassExpression selectedClass) {
         root = selectedClass;
     }
 
+    @Override
     public void setProp(OWLObjectProperty prop){
         if (prop != null){
             Set<OWLObjectProperty> propAndDescendants = new HashSet<OWLObjectProperty>(hp.getDescendants(prop));

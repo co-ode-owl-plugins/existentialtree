@@ -1,11 +1,9 @@
 package org.coode.outlinetree.model;
 
-import org.semanticweb.owlapi.model.OWLAxiom;
-
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLAxiom;
 
 /**
  * Author: Nick Drummond<br>
@@ -44,8 +42,8 @@ abstract class AbstractOutlineNode<O, P extends OutlineNode> implements OutlineN
         this.editable = editable;
     }
 
-    public void addAxioms(Set<OWLAxiom> axioms){
-        this.axioms.addAll(axioms);
+    public void addAxioms(Set<OWLAxiom> axiomsToAdd){
+        this.axioms.addAll(axiomsToAdd);
     }
 
     public final boolean isEditable() {
@@ -74,13 +72,12 @@ abstract class AbstractOutlineNode<O, P extends OutlineNode> implements OutlineN
     protected abstract void clear();
 
 
+    @Override
     public int hashCode() {
-        List l = new ArrayList();
-        l.add(getUserObject());
-        l.add(getAxioms());
-        return l.hashCode();
+        return getUserObject().hashCode()*37+getAxioms().hashCode();
     }
 
+    @Override
     public boolean equals(Object object) {
         return object instanceof OutlineNode &&
                 ((OutlineNode)object).getUserObject().equals(getUserObject()) &&

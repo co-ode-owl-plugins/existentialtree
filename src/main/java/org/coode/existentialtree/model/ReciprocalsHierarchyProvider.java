@@ -1,10 +1,5 @@
 package org.coode.existentialtree.model;
 
-import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owlapi.util.OWLAxiomVisitorAdapter;
-import org.semanticweb.owlapi.util.OWLClassExpressionVisitorAdapter;
-
-import java.util.*;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -27,6 +22,25 @@ import java.util.*;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLObjectExactCardinality;
+import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.util.OWLAxiomVisitorAdapter;
+import org.semanticweb.owlapi.util.OWLClassExpressionVisitorAdapter;
 
 /**
  * Author: drummond<br>
@@ -46,21 +60,19 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
 
     private Map<OWLClass, Set<OWLClass>> nodes = new HashMap<OWLClass, Set<OWLClass>>();
 
-    private OWLOntologyManager mngr;
-
-
     public ReciprocalsHierarchyProvider(OWLOntologyManager owlOntologyManager) {
         super(owlOntologyManager);
-        this.mngr = owlOntologyManager;
     }
 
 
+    @Override
     public void setRoot(OWLClass selectedClass) {
         this.root = selectedClass;
         reload();
     }
 
 
+    @Override
     public void setProp(OWLObjectProperty prop) {
         this.prop = prop;
         reload();
@@ -117,7 +129,7 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
     }
 
 
-    private boolean followProperty(OWLObjectPropertyExpression candidate){
+    protected boolean followProperty(OWLObjectPropertyExpression candidate){
         // @@TODO take property hierarchy into account
         return prop == null || prop.equals(candidate);
     }
@@ -129,7 +141,7 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
 
         private OWLClass reciprocal;
 
-        private OWLClass cls;
+        protected OWLClass cls;
 
         ReciprocalAxiomVisitor(OWLClass cls) {
             this.cls = cls;
@@ -141,6 +153,7 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
             return reciprocal;
         }
 
+        @Override
         public void visit(OWLSubClassOfAxiom owlSubClassAxiom) {
             if (exprVisitor.isReciprocal(owlSubClassAxiom.getSuperClass()) &&
                 !owlSubClassAxiom.getSubClass().isAnonymous()){
@@ -162,6 +175,7 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
             }
 
 
+            @Override
             public void visit(OWLObjectSomeValuesFrom restriction) {
                 if (followProperty(restriction.getProperty()) &&
                     restriction.getFiller().equals(cls)){ // @@TODO fillers in intersections?
@@ -170,6 +184,7 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
             }
 
 
+            @Override
             public void visit(OWLObjectMinCardinality restriction) {
                 if (restriction.getCardinality() > 0 &&
                     followProperty(restriction.getProperty()) &&
@@ -179,6 +194,7 @@ public class ReciprocalsHierarchyProvider extends AbstractHierarchyProvider<OWLC
             }
 
 
+            @Override
             public void visit(OWLObjectExactCardinality restriction) {
                 if (restriction.getCardinality() > 0 &&
                     followProperty(restriction.getProperty()) &&

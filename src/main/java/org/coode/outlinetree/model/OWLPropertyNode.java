@@ -1,10 +1,5 @@
 package org.coode.outlinetree.model;
 
-import org.coode.outlinetree.util.AbstractExistentialFinder;
-import org.coode.outlinetree.util.OutlineRestrictionVisitor;
-import org.semanticweb.owlapi.model.*;
-
-import java.util.*;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -27,6 +22,24 @@ import java.util.*;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.coode.outlinetree.util.AbstractExistentialFinder;
+import org.coode.outlinetree.util.OutlineRestrictionVisitor;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataHasValue;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObjectHasValue;
+import org.semanticweb.owlapi.model.OWLPropertyExpression;
+import org.semanticweb.owlapi.model.OWLPropertyRange;
+import org.semanticweb.owlapi.model.OWLQuantifiedRestriction;
+import org.semanticweb.owlapi.model.OWLRestriction;
 
 /**
  * Author: Nick Drummond<br>
@@ -66,10 +79,10 @@ import java.util.*;
  */
 class OWLPropertyNode extends AbstractOutlineNode<Set<OWLRestriction>/*OWLPropertyExpression*/, OutlineNode<OWLClassExpression, OutlineNode>> {
 
-    private OWLPropertyExpression property;
+    protected OWLPropertyExpression property;
     private List<OutlineNode> orderedChildren;
 
-    private Set<OutlineNode> children = new HashSet<OutlineNode>();
+    protected Set<OutlineNode> children = new HashSet<OutlineNode>();
     private Set<OWLRestriction> restrs = new HashSet<OWLRestriction>();
 
 
@@ -102,6 +115,7 @@ class OWLPropertyNode extends AbstractOutlineNode<Set<OWLRestriction>/*OWLProper
         return property;
     }
 
+    @Override
     public String toString() {
         return getUserObject().toString();
     }
@@ -109,7 +123,7 @@ class OWLPropertyNode extends AbstractOutlineNode<Set<OWLRestriction>/*OWLProper
     private void refresh() {
         children.clear();
 
-        ChildrenBuilder builder = new ChildrenBuilder(getModel().getOntologies());
+        ChildrenBuilder builder = new ChildrenBuilder();
 
         for (OWLRestriction restriction : restrs){
             restriction.accept(builder);
@@ -120,6 +134,7 @@ class OWLPropertyNode extends AbstractOutlineNode<Set<OWLRestriction>/*OWLProper
         orderedChildren = Collections.unmodifiableList(orderedChildren);
     }
 
+    @Override
     protected void clear() {
         orderedChildren = null;
     }
@@ -129,11 +144,11 @@ class OWLPropertyNode extends AbstractOutlineNode<Set<OWLRestriction>/*OWLProper
     }
 
     // maps the restrictions back to the axioms that contain them
-    private Set<OWLAxiom> getAxiomsForRestriction(OWLRestriction restriction) {
+    protected Set<OWLAxiom> getAxiomsForRestriction(OWLRestriction restriction) {
         if (getParent().getUserObject() instanceof OWLClass){ // potentially multiple axioms to try
             Set<OWLAxiom> matchingAxioms = new HashSet<OWLAxiom>();
             for (OWLAxiom ax : getAxioms()){
-                AxiomFinder v = new AxiomFinder(getModel().getOntologies(), getModel().getMin());
+                AxiomFinder v = new AxiomFinder(getModel().getMin());
                 if (v.doesAxiomContainRestriction(ax, restriction)){
                     matchingAxioms.add(ax);
                 }
@@ -155,8 +170,8 @@ class OWLPropertyNode extends AbstractOutlineNode<Set<OWLRestriction>/*OWLProper
         private boolean result = false;
         private OWLRestriction searchRestriction;
 
-        public AxiomFinder(Set<OWLOntology> onts, int min) {
-            super(onts, min);
+        public AxiomFinder(int min) {
+            super(min);
         }
 
         public boolean doesAxiomContainRestriction(OWLAxiom ax, OWLRestriction restriction){
@@ -166,6 +181,7 @@ class OWLPropertyNode extends AbstractOutlineNode<Set<OWLRestriction>/*OWLProper
             return result;
         }
 
+        @Override
         protected void handleRestriction(OWLRestriction restriction) {
             if (searchRestriction.equals(restriction)){
                 result = true;
@@ -178,29 +194,27 @@ class OWLPropertyNode extends AbstractOutlineNode<Set<OWLRestriction>/*OWLProper
      */
     class ChildrenBuilder extends AbstractExistentialFinder {
 
-        public ChildrenBuilder(Set<OWLOntology> onts) {
-            super(onts);
-        }
-
-
+        @Override
         public void visit(OWLDataHasValue restriction) {
             if (restriction.getProperty().equals(property)){
-                OutlineNode child = getModel().createNode(restriction.getValue(), OWLPropertyNode.this);
+                OutlineNode child = getModel().createNode(restriction.getFiller(), OWLPropertyNode.this);
                 child.addAxioms(getAxiomsForRestriction(restriction));
                 children.add(child);
             }
         }
 
 
+        @Override
         public void visit(OWLObjectHasValue restriction) {
             if (restriction.getProperty().equals(property)){
-                OutlineNode child = getModel().createNode(restriction.getValue(), OWLPropertyNode.this);
+                OutlineNode child = getModel().createNode(restriction.getFiller(), OWLPropertyNode.this);
                 child.addAxioms(getAxiomsForRestriction(restriction));
                 children.add(child);
             }
         }
 
 
+        @Override
         protected void handleQuantifiedRestriction(OWLQuantifiedRestriction restriction) {
             if (restriction.getProperty().equals(property)){
                 final OWLPropertyRange filler = restriction.getFiller();
@@ -213,6 +227,7 @@ class OWLPropertyNode extends AbstractOutlineNode<Set<OWLRestriction>/*OWLProper
         }
 
 
+        @Override
         protected int getMinCardinality() {
             return getModel().getMin();
         }

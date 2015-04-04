@@ -1,15 +1,6 @@
 package org.coode.outlinetree.ui;
 
-import org.coode.outlinetree.model.OutlineNode;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLObject;
-
-import javax.swing.*;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.util.HashSet;
 import java.util.Set;
 /*
@@ -35,6 +26,16 @@ import java.util.Set;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.JScrollPane;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreePath;
+
+import org.coode.outlinetree.model.OutlineNode;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLObject;
+
 /**
  * Author: Nick Drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -44,6 +45,7 @@ import java.util.Set;
  * Date: Oct 29, 2007<br><br>
  */
 public class OutlineView extends AbstractOutlineView {
+    private static final long serialVersionUID = 1L;
 
     private OutlineTree tree;
 
@@ -54,6 +56,7 @@ public class OutlineView extends AbstractOutlineView {
         }
     };
 
+    @Override
     public void disposeView() {
         if (tree != null){
             tree.getSelectionModel().removeTreeSelectionListener(treeSelListener);
@@ -61,6 +64,7 @@ public class OutlineView extends AbstractOutlineView {
         super.disposeView();
     }
 
+    @Override
     protected void refreshGUI() {
         if (tree == null){
             tree = new OutlineTree(model, getOWLEditorKit());
@@ -89,6 +93,7 @@ public class OutlineView extends AbstractOutlineView {
         return paths;
     }
 
+    @Override
     protected OWLClass updateView(OWLClass selectedClass) {
         if (isSynchronizing()){
             if (!ignoreUpdateView){
@@ -100,6 +105,7 @@ public class OutlineView extends AbstractOutlineView {
         return selectedClass;
     }
 
+    @Override
     protected void updateHeader(OWLObject object) {
         String str = "(" + propertyLabel + ")";
         if (object != null){
@@ -109,7 +115,7 @@ public class OutlineView extends AbstractOutlineView {
     }
 
 
-    private void handleNodeSelection(OutlineNode node) {
+    protected void handleNodeSelection(OutlineNode node) {
         this.currentSelection = node;
         OWLObject owlObject = node.getRenderedObject();
         if (owlObject instanceof OWLClass){

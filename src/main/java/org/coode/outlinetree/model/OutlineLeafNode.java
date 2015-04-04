@@ -1,7 +1,5 @@
 package org.coode.outlinetree.model;
 
-import org.semanticweb.owlapi.model.OWLObject;
-
 import java.util.Collections;
 import java.util.List;
 /*
@@ -26,6 +24,8 @@ import java.util.List;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+import org.semanticweb.owlapi.model.OWLObject;
 
 /**
  * Author: drummond<br>
@@ -66,6 +66,7 @@ class OutlineLeafNode<O extends OWLObject> extends AbstractOutlineNode<O, OWLPro
         return null;
     }
 
+    @Override
     protected void clear() {
         // do nothing
     }

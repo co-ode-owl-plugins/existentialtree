@@ -1,8 +1,5 @@
 package org.coode.outlinetree.model;
 
-import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owlapi.model.OWLObject;
-
 import java.util.Comparator;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -26,6 +23,9 @@ import java.util.Comparator;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owlapi.model.OWLObject;
 
 /**
  * Author: Nick Drummond<br>
@@ -51,7 +51,7 @@ public class OutlineNodeComparator implements Comparator<OutlineNode> {
         return owlComparator.compare((OWLObject)o, (OWLObject)o1);
         }
         else if (o instanceof Comparable && o1 instanceof Comparable){
-            return ((Comparable)o).compareTo(((Comparable)o1));
+            return ((Comparable)o).compareTo((o1));
         }
         else if (o.hashCode() != o1.hashCode()){
             return (o.hashCode() > o1.hashCode()) ? 1 : -1;

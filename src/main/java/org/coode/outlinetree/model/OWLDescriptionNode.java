@@ -1,9 +1,5 @@
 package org.coode.outlinetree.model;
 
-import org.coode.outlinetree.util.OutlinePropertyIndexer;
-import org.coode.outlinetree.util.SuperAndEquivAxiomUtils;
-import org.semanticweb.owlapi.model.*;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +26,16 @@ import java.util.Set;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+import org.coode.outlinetree.util.OutlinePropertyIndexer;
+import org.coode.outlinetree.util.SuperAndEquivAxiomUtils;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
+import org.semanticweb.owlapi.model.OWLProperty;
+import org.semanticweb.owlapi.model.OWLPropertyExpression;
 
 /**
  * Author: Nick Drummond<br>
@@ -71,6 +77,7 @@ class OWLClassExpressionNode<O extends OWLClassExpression> extends AbstractOutli
         return renderedObject;
     }
 
+    @Override
     protected void clear() {
         children = null;
     }
@@ -86,7 +93,7 @@ class OWLClassExpressionNode<O extends OWLClassExpression> extends AbstractOutli
     protected void refresh() {
         OutlineTreeModel model = getModel();
 
-        OutlinePropertyIndexer finder = new OutlinePropertyIndexer(model.getOntologies(), model.getMin());
+        OutlinePropertyIndexer finder = new OutlinePropertyIndexer(model.getMin());
         descr.accept(finder);
 
         if (descr.isAnonymous()){
@@ -103,7 +110,7 @@ class OWLClassExpressionNode<O extends OWLClassExpression> extends AbstractOutli
         }
 
         if (model.getShowInheritedChildrenAllNodes()){ // children from eg named classes in an intersection
-            createChildrenFromAxioms(getGlobalAxioms(descr, finder), false);
+            createChildrenFromAxioms(getGlobalAxioms(finder), false);
         }
     }
 
@@ -142,7 +149,7 @@ class OWLClassExpressionNode<O extends OWLClassExpression> extends AbstractOutli
     }
 
     // get any more global things we can say about the class at this node
-    private Set<OWLAxiom> getGlobalAxioms(OWLClassExpression descr, OutlinePropertyIndexer finder) {
+    private Set<OWLAxiom> getGlobalAxioms(OutlinePropertyIndexer finder) {
         Set<OWLAxiom> globalAxioms = new HashSet<OWLAxiom>();
         final Set<OWLClass> ancestors = finder.getClassesToInheritFrom();
 
@@ -153,7 +160,7 @@ class OWLClassExpressionNode<O extends OWLClassExpression> extends AbstractOutli
     }
 
     private void createChildrenFromAxioms(Set<OWLAxiom> axioms, boolean editable) {
-        OutlinePropertyIndexer finder = new OutlinePropertyIndexer(getModel().getOntologies(), getModel().getMin());
+        OutlinePropertyIndexer finder = new OutlinePropertyIndexer(getModel().getMin());
         for (OWLAxiom ax : axioms){
             ax.accept(finder);
         }
@@ -169,6 +176,7 @@ class OWLClassExpressionNode<O extends OWLClassExpression> extends AbstractOutli
         return OWLProperty.class;
     }
 
+    @Override
     public String toString() {
         return getUserObject().toString();
     }

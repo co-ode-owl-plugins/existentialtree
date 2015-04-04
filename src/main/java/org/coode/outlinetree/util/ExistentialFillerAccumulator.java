@@ -89,11 +89,13 @@ public class ExistentialFillerAccumulator extends OWLClassExpressionVisitorAdapt
     }
 
     // Named supers are also queried for inherited restrictions
+    @Override
     public void visit(OWLClass desc) {
         ExistentialFillerAccumulator acc = new ExistentialFillerAccumulator(properties);
         fillers.addAll(acc.getExistentialFillers(desc, onts));
     }
 
+    @Override
     public void visit(OWLObjectSomeValuesFrom desc) {
         if (properties == null || properties.contains(desc.getProperty())) {
 
@@ -101,29 +103,28 @@ public class ExistentialFillerAccumulator extends OWLClassExpressionVisitorAdapt
         }
     }
 
+    @Override
     public void visit(OWLObjectMinCardinality desc) {
         if (desc.getCardinality() > 0 &&
             (properties == null || properties.contains(desc.getProperty()))) {
 
             OWLClassExpression filler = desc.getFiller();
-            if (filler != null) {
-                fillers.add(filler);
-            }
+            fillers.add(filler);
         }
     }
 
+    @Override
     public void visit(OWLObjectExactCardinality desc) {
         if (desc.getCardinality() > 0 &&
             properties == null || properties.contains(desc.getProperty())) {
 
             OWLClassExpression filler = desc.getFiller();
-            if (filler != null) {
-                fillers.add(filler);
-            }
+            fillers.add(filler);
         }
     }
 
     // need to flatten intersections - particularly for equiv classes which are often A and (restriction)
+    @Override
     public void visit(OWLObjectIntersectionOf and) {
         for (OWLClassExpression desc : and.getOperands()) {
             if (!fillers.contains(desc)){

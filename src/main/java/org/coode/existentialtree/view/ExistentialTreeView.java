@@ -37,10 +37,12 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
  * <p/>
  */
 public class ExistentialTreeView extends AbstractTreeView {
+    private static final long serialVersionUID = 1L;
 
     private AbstractHierarchyProvider treeProvider;
 
 
+    @Override
     protected AbstractHierarchyProvider<OWLClassExpression> getHierarchyProvider() {
         if (treeProvider == null){
             treeProvider = new OWLExistentialHierarchyProvider(getOWLModelManager());

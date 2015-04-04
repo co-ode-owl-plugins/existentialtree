@@ -34,10 +34,12 @@ import org.coode.existentialtree.model.ReciprocalsHierarchyProvider;
  * Date: May 18, 2009<br><br>
  */
 public class ReciprocalsTreeView extends AbstractTreeView {
+    private static final long serialVersionUID = 1L;
 
     private ReciprocalsHierarchyProvider provider;
 
 
+    @Override
     protected AbstractHierarchyProvider getHierarchyProvider() {
         if (provider == null){
             provider = new ReciprocalsHierarchyProvider(getOWLModelManager().getOWLOntologyManager());

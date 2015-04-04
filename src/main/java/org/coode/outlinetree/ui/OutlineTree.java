@@ -1,13 +1,6 @@
 package org.coode.outlinetree.ui;
 
-import org.coode.outlinetree.model.OutlineNode;
-import org.coode.outlinetree.model.OutlineTreeModel;
-import org.protege.editor.owl.OWLEditorKit;
-import org.semanticweb.owlapi.model.OWLAxiom;
-
-import javax.swing.*;
-import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.util.Set;
 /*
@@ -33,6 +26,14 @@ import java.util.Set;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.JTree;
+import javax.swing.tree.TreePath;
+
+import org.coode.outlinetree.model.OutlineNode;
+import org.coode.outlinetree.model.OutlineTreeModel;
+import org.protege.editor.owl.OWLEditorKit;
+import org.semanticweb.owlapi.model.OWLAxiom;
+
 /**
  * Author: Nick Drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -42,6 +43,7 @@ import java.util.Set;
  * Date: Oct 29, 2007<br><br>
  */
 public class OutlineTree extends JTree {
+    private static final long serialVersionUID = 1L;
     
     private OWLEditorKit eKit;
 
@@ -53,6 +55,7 @@ public class OutlineTree extends JTree {
         setCellRenderer(new OutlineTreeRenderer(eKit));
     }
 
+    @Override
     public String getToolTipText(MouseEvent event) {
         OutlineNode node = getNodeAtMousePosition(event);
         String text = "";

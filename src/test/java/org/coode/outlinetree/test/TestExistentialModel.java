@@ -49,8 +49,6 @@ public class TestExistentialModel extends TestCase {
 
     private OWLOntology ont;
 
-    private int indent = 0;
-
     public void testDirectChildren(){
         init();
         OutlineTreeModel model = new OutlineTreeModel(mngr, mngr.getOntologies(), null, new BasicComparator());
@@ -122,33 +120,6 @@ public class TestExistentialModel extends TestCase {
         assertEquals(1, model.getChildCount(hasTopping));
         OutlineNode cheeseTopping = model.getChild(hasTopping, 0);
         assertEquals(getNamedClass("CheeseTopping"), cheeseTopping.getUserObject());
-    }
-
-    private OutlineNode findNode(OutlineTreeModel model, OutlineNode start, OWLClass namedClass) {
-        indent++;
-        for (int i=0; i<model.getChildCount(start); i++){
-            OutlineNode child = model.getChild(start, i);
-            System.out.println(leftPad("+ " + child, indent*2));
-            Object obj = child.getUserObject();
-            if (obj.equals(namedClass)){
-                return child;
-            }
-            else if (!model.isLeaf(child)){
-                OutlineNode node = findNode(model, child, namedClass);
-                if (node != null){
-                    return node;
-                }
-            }
-        }
-        indent--;
-        return null;
-    }
-    private String leftPad(String s, int spaces) {
-        StringBuilder b=new StringBuilder(s);
-        for(int i=0; i<spaces;i++) {
-            b.append(' ');
-        }
-        return b.toString();
     }
 
     private void init(){

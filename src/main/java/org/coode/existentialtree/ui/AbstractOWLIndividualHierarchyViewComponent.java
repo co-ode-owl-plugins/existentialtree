@@ -1,20 +1,6 @@
 package org.coode.existentialtree.ui;
 
-import org.protege.editor.core.ui.util.ComponentFactory;
-import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.protege.editor.owl.ui.action.OWLObjectHierarchyDeleter;
-import org.protege.editor.owl.ui.tree.OWLModelManagerTree;
-import org.protege.editor.owl.ui.tree.OWLObjectTree;
-import org.protege.editor.owl.ui.tree.OWLObjectTreeCellRenderer;
-import org.protege.editor.owl.ui.view.ChangeListenerMediator;
-import org.protege.editor.owl.ui.view.Findable;
-import org.protege.editor.owl.ui.view.individual.AbstractOWLIndividualViewComponent;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
-import org.semanticweb.owlapi.model.OWLObject;
-import org.semanticweb.owlapi.util.OWLEntitySetProvider;
-
-import javax.swing.event.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -43,6 +29,25 @@ import java.util.Set;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.event.ChangeListener;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+
+import org.protege.editor.core.ui.util.ComponentFactory;
+import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
+import org.protege.editor.owl.ui.action.OWLObjectHierarchyDeleter;
+import org.protege.editor.owl.ui.tree.OWLModelManagerTree;
+import org.protege.editor.owl.ui.tree.OWLObjectTree;
+import org.protege.editor.owl.ui.tree.OWLObjectTreeCellRenderer;
+import org.protege.editor.owl.ui.view.ChangeListenerMediator;
+import org.protege.editor.owl.ui.view.Findable;
+import org.protege.editor.owl.ui.view.individual.AbstractOWLIndividualViewComponent;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.util.OWLEntitySetProvider;
+
 /**
  * Author: Nick Drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -56,13 +61,15 @@ import java.util.Set;
  */
 public abstract class AbstractOWLIndividualHierarchyViewComponent extends AbstractOWLIndividualViewComponent
         implements Findable<OWLNamedIndividual> { //, Deleteable {
+    private static final long serialVersionUID = 1L;
 
-    private OWLModelManagerTree<OWLNamedIndividual> tree;
+    protected OWLModelManagerTree<OWLNamedIndividual> tree;
 
     private TreeSelectionListener listener;
 
     private OWLObjectHierarchyDeleter<OWLNamedIndividual> hierarchyDeleter;
 
+    @Override
     final public void initialiseIndividualsView() throws Exception {
 
         setLayout(new BorderLayout(7, 7));
@@ -104,6 +111,7 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
         });
 
         tree.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseReleased(MouseEvent e) {
                 transmitSelection();
             }
@@ -120,7 +128,7 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
 
     }
 
-    private void ensureSelection() {
+    protected void ensureSelection() {
         OWLNamedIndividual ind = getSelectedOWLIndividual();
         if (ind != null) {
             OWLNamedIndividual treeSel = tree.getSelectedOWLObject();
@@ -131,6 +139,7 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
     }
 
 
+    @Override
     public boolean requestFocusInWindow() {
         return tree.requestFocusInWindow();
     }
@@ -172,6 +181,7 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
     }
 
 
+    @Override
     public OWLNamedIndividual updateView(OWLNamedIndividual individual) {
         if (tree.getSelectedOWLObject() == null) {
             if (individual != null) {
@@ -194,6 +204,7 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
     protected abstract OWLObjectHierarchyProvider<OWLNamedIndividual> getOWLIndividualHierarchyProvider();
 
 
+    @Override
     public void disposeView() {
         // Dispose of the tree selection listener
         if (tree != null) {
@@ -203,6 +214,7 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
     }
 
 
+    @Override
     protected OWLObject getObjectToCopy() {
         return tree.getSelectedOWLObject();
     }
@@ -216,13 +228,13 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
     private ChangeListenerMediator deletableChangeListenerMediator = new ChangeListenerMediator();
 
 
-    public void addChangeListener(ChangeListener listener) {
-        deletableChangeListenerMediator.addChangeListener(listener);
+    public void addChangeListener(ChangeListener l) {
+        deletableChangeListenerMediator.addChangeListener(l);
     }
 
 
-    public void removeChangeListener(ChangeListener listener) {
-        deletableChangeListenerMediator.removeChangeListener(listener);
+    public void removeChangeListener(ChangeListener l) {
+        deletableChangeListenerMediator.removeChangeListener(l);
     }
 
 

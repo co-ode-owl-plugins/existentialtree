@@ -1,15 +1,23 @@
 package org.coode.existentialtree.ui;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.swing.JComboBox;
+
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
-import org.semanticweb.owlapi.model.*;
-
-import javax.swing.*;
-import java.util.*;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
+import org.semanticweb.owlapi.model.OWLProperty;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -44,17 +52,18 @@ import java.util.*;
  * <p/>
  */
 public class ObjectPropertyCombo extends JComboBox {
+    private static final long serialVersionUID = 1L;
 
     private OWLModelManager mngr;
 
-    private boolean changesMade = false;
+    protected boolean changesMade = false;
 
 
     public static final String ALL_PROPERTIES = "All Object Properties";
 
     private OWLOntologyChangeListener ontologyChangeListener = new OWLOntologyChangeListener() {
-        public void ontologiesChanged(List<? extends OWLOntologyChange> changes) throws OWLException {
-            changesMade = true; // @@TODO should only respond to changes that add or remove properties
+        public void ontologiesChanged(List<? extends OWLOntologyChange> changes) {
+            changesMade = true; // TODO should only respond to changes that add or remove properties
         }
     };
 
@@ -86,6 +95,7 @@ public class ObjectPropertyCombo extends JComboBox {
         mngr.addListener(activeOntologyListener);
     }
 
+    @Override
     public void setPopupVisible(boolean v) {
         if (changesMade) {
             reload();
@@ -94,7 +104,7 @@ public class ObjectPropertyCombo extends JComboBox {
         super.setPopupVisible(v);
     }
 
-    private void reload() {
+    protected void reload() {
         removeAllItems();
         load();
     }
@@ -116,6 +126,7 @@ public class ObjectPropertyCombo extends JComboBox {
         }
     }
 
+    @Override
     protected void finalize() throws Throwable {
         mngr.removeOntologyChangeListener(ontologyChangeListener);
         mngr.removeListener(activeOntologyListener);

@@ -1,12 +1,5 @@
 package org.coode.outlinetree.model;
 
-import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.semanticweb.owlapi.model.*;
-
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -33,6 +26,30 @@ import java.util.Set;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+
+import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
+import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDataRange;
+import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLPropertyExpression;
+import org.semanticweb.owlapi.model.RemoveAxiom;
 
 /**
  * Author: Nick Drummond<br>
@@ -222,9 +239,9 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
      */
     public List<OWLOntologyChange> delete(OutlineNode node) throws OWLOntologyChangeException {
         List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
-        final Set<OWLAxiom> axioms = node.getAxioms(); // god knows why intelliJ is getting the generics f***d up on this
-        for (OWLAxiom ax : axioms){
-            //@@TODO below will only remove the whole path for the current node - need to handle truncating arbitrary descriptions
+//        final Set<OWLAxiom> axioms = node.getAxioms(); // god knows why intelliJ is getting the generics f***d up on this
+//        for (OWLAxiom ax : axioms){
+//        TODO below will only remove the whole path for the current node - need to handle truncating arbitrary descriptions
 //            if (isSubjectOfAxiom(getRoot().getUserObject(), ax)){
 //                for (OWLOntology ont : onts){
 //                    if (ont.containsAxiom(ax)){
@@ -232,7 +249,7 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
 //                    }
 //                }
 //            }
-        }
+      //  }
         return changes;
     }
 
@@ -245,18 +262,6 @@ public class OutlineTreeModel implements TreeModel, OutlineNodeFactory {
     public OWLObjectHierarchyProvider<OWLClass> getClassHierarchyProvider() {
         return subsumptionHierarchyProvider;
     }
-
-
-    private boolean isSubjectOfAxiom(OWLObject owlObject, OWLAxiom ax) {
-        if (ax instanceof OWLSubClassOfAxiom){
-            return ((OWLSubClassOfAxiom)ax).getSubClass().equals(owlObject);
-        }
-        else if (ax instanceof OWLEquivalentClassesAxiom){
-            return ((OWLEquivalentClassesAxiom)ax).getClassExpressions().contains(owlObject);
-        }
-        return false;
-    }
-
 
     public boolean getShowInheritedChildrenAllNodes() {
         return showInheritedChildrenAllNodes;

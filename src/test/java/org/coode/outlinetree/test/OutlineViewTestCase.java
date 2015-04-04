@@ -1,12 +1,8 @@
 package org.coode.outlinetree.test;
 
-import junit.framework.TestCase;
-import org.coode.outlinetree.model.OutlineNode;
-import org.coode.outlinetree.model.OutlineTreeModel;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.*;
 
-import java.util.*;
+import static org.junit.Assert.*;
+
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -29,6 +25,30 @@ import java.util.*;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.coode.outlinetree.model.OutlineNode;
+import org.coode.outlinetree.model.OutlineTreeModel;
+import org.junit.Before;
+import org.junit.Test;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 /**
  * Author: drummond<br>
@@ -56,7 +76,7 @@ import java.util.*;
  * --q
  *   --D
  */
-public class OutlineViewTestCase extends TestCase {
+public class OutlineViewTestCase {
 
     private static final IRI ONTOLOGY_IRI = IRI.create("http://www.co-ode.org/ontologies/test/outlineview.owl");
 
@@ -77,9 +97,8 @@ public class OutlineViewTestCase extends TestCase {
     private OWLSubClassOfAxiom aQSomeD;
 
     private OWLObjectIntersectionOf cAndRSomeE;
-
-    public void init(){
-        try {
+    @Before
+    public void init() throws OWLOntologyCreationException{
             mngr = OWLManager.createOWLOntologyManager();
             ont = mngr.createOntology(ONTOLOGY_IRI);
 
@@ -112,13 +131,8 @@ public class OutlineViewTestCase extends TestCase {
             changes.add(new AddAxiom(ont, aQSomeD));
             mngr.applyChanges(changes);
         }
-        catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    public void testStructure(){
+    @Test
+    public void testStructure() throws OWLOntologyCreationException{
         init();
         OutlineTreeModel model = new OutlineTreeModel(mngr, Collections.singleton(ont), null, new BasicComparator());
         model.setRoot(a);
@@ -148,7 +162,8 @@ public class OutlineViewTestCase extends TestCase {
         assertSame(1, qNodeAxioms.size());
     }
 
-    public void testAxiomsLoaded(){
+    @Test
+    public void testAxiomsLoaded() throws OWLOntologyCreationException{
         init();
         OutlineTreeModel model = new OutlineTreeModel(mngr, Collections.singleton(ont), null, new BasicComparator());
         model.setRoot(a);

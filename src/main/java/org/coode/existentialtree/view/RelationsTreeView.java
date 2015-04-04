@@ -36,9 +36,11 @@ import org.coode.existentialtree.model.OWLRelationHierarchyProvider;
  * This currently does not work - it should not extend AbstractOWLClassExpressionHierarchyViewComponent
  */
 public class RelationsTreeView extends AbstractTreeView {
+    private static final long serialVersionUID = 1L;
 
     private AbstractHierarchyProvider treeProvider;
 
+    @Override
     protected AbstractHierarchyProvider getHierarchyProvider() {
         if (treeProvider == null){
             treeProvider = new OWLRelationHierarchyProvider(getOWLModelManager());

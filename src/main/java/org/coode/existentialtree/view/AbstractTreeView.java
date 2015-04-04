@@ -1,15 +1,5 @@
 package org.coode.existentialtree.view;
 
-import org.coode.existentialtree.model.AbstractHierarchyProvider;
-import org.coode.existentialtree.ui.AbstractOWLClassExpressionHierarchyViewComponent;
-import org.protege.editor.core.ui.view.DisposableAction;
-import org.protege.editor.owl.model.event.EventType;
-import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
-import org.protege.editor.owl.model.event.OWLModelManagerListener;
-import org.protege.editor.owl.ui.OWLIcons;
-import org.protege.editor.owl.ui.UIHelper;
-import org.semanticweb.owlapi.model.*;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
@@ -36,6 +26,20 @@ import java.awt.event.HierarchyListener;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import org.coode.existentialtree.model.AbstractHierarchyProvider;
+import org.coode.existentialtree.ui.AbstractOWLClassExpressionHierarchyViewComponent;
+import org.protege.editor.core.ui.view.DisposableAction;
+import org.protege.editor.owl.model.event.EventType;
+import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
+import org.protege.editor.owl.model.event.OWLModelManagerListener;
+import org.protege.editor.owl.ui.OWLIcons;
+import org.protege.editor.owl.ui.UIHelper;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
+
 /**
  * Author: Nick Drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -45,6 +49,7 @@ import java.awt.event.HierarchyListener;
  * Date: Oct 29, 2007<br><br>
  */
 public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLClassExpressionHierarchyViewComponent {
+    private static final long serialVersionUID = 1L;
 
     private static final String ALL_PROPERTIES = "all properties";
 
@@ -52,10 +57,10 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLC
 
     private boolean ignoreUpdateView = false;
 
-    private boolean requiresRefresh = false;
+    protected boolean requiresRefresh = false;
 
     private OWLOntologyChangeListener ontListener = new OWLOntologyChangeListener(){
-        public void ontologiesChanged(java.util.List<? extends OWLOntologyChange> changes) throws OWLException {
+        public void ontologiesChanged(java.util.List<? extends OWLOntologyChange> changes) {
             refresh();
         }
     };
@@ -69,26 +74,22 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLC
     };
 
     private DisposableAction selectPropertyAction = new DisposableAction("Select Property", OWLIcons.getIcon("property.object.png")){
+        private static final long serialVersionUID = 1L;
         public void actionPerformed(ActionEvent actionEvent) {
             handleSelectProperty();
         }
+        @Override
         public void dispose() {
         }
     };
 
     private DisposableAction clearPropertyAction = new DisposableAction("Clear Property", OWLIcons.getIcon("property.object.delete.png")){
+        private static final long serialVersionUID = 1L;
         public void actionPerformed(ActionEvent actionEvent) {
             handleClearProperty();
         }
+        @Override
         public void dispose() {
-        }
-    };
-
-    private DisposableAction addNodeAction = new DisposableAction("Add Node", OWLIcons.getIcon("class.add.sub.png")){
-        public void dispose() {
-            handleAddNode();
-        }
-        public void actionPerformed(ActionEvent actionEvent) {
         }
     };
 
@@ -103,10 +104,10 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLC
 
 
     protected void handleAddNode() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    protected void performExtraInitialisation() throws Exception {
+    @Override
+    protected void performExtraInitialisation() {
 
         getOWLModelManager().addOntologyChangeListener(ontListener);
 
@@ -121,6 +122,7 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLC
         clearPropertyAction.setEnabled(false);
     }
 
+    @Override
     public void disposeView() {
         getOWLModelManager().removeOntologyChangeListener(ontListener);
         getOWLModelManager().removeListener(mngrListener);
@@ -133,13 +135,16 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLC
 
 
     // overload to prevent selection changing as we click on classes in the hierarchy
+    @Override
     protected void transmitSelection() {
         ignoreUpdateView = true;
         super.transmitSelection();
     }
 
+    @Override
     protected abstract AbstractHierarchyProvider getHierarchyProvider();
 
+    @Override
     protected OWLClass updateView(OWLClass selectedClass) {
         if (!ignoreUpdateView){
 
@@ -155,7 +160,7 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLC
         return selectedClass;
     }
 
-    private void refresh() {
+    protected void refresh() {
         if (isShowing()){
             getTree().reload();
             getTree().expandAll();
@@ -166,6 +171,7 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLC
         }
     }
 
+    @Override
     protected void updateHeader(OWLObject object) {
         String str = "(" + propertyLabel + ")";
         if (object != null){
@@ -174,7 +180,7 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLC
         getView().setHeaderText(str);
     }
 
-    private void handleSelectProperty() {
+    protected void handleSelectProperty() {
         OWLObjectProperty prop = new UIHelper(getOWLEditorKit()).pickOWLObjectProperty();
         if (prop != null){
             propertyLabel = getOWLModelManager().getRendering(prop);
@@ -185,7 +191,7 @@ public abstract class AbstractTreeView<O extends OWLObject> extends AbstractOWLC
         }
     }
 
-    private void handleClearProperty() {
+    protected void handleClearProperty() {
         propertyLabel = ALL_PROPERTIES;
         getHierarchyProvider().setProp(null);
         refresh();

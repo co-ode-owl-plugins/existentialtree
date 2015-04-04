@@ -98,10 +98,12 @@ public class OWLRelationHierarchyProvider extends AbstractHierarchyProvider<OWLI
         return object.equals(root);
     }
 
+    @Override
     public void setRoot(OWLIndividual individual) {
         root = individual;
     }
 
+    @Override
     public void setProp(OWLObjectProperty prop){
         propAndDescendants.clear();
         if (prop != null){

@@ -1,8 +1,5 @@
 package org.coode.outlinetree.util;
 
-import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owlapi.util.OWLObjectVisitorAdapter;
-
 import java.util.HashSet;
 import java.util.Set;
 /*
@@ -28,6 +25,21 @@ import java.util.Set;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import org.semanticweb.owlapi.model.OWLCardinalityRestriction;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataExactCardinality;
+import org.semanticweb.owlapi.model.OWLDataMinCardinality;
+import org.semanticweb.owlapi.model.OWLDataSomeValuesFrom;
+import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObjectExactCardinality;
+import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
+import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
+import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
+import org.semanticweb.owlapi.model.OWLQuantifiedRestriction;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.util.OWLObjectVisitorAdapter;
+
 /**
  * Author: Nick Drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -43,10 +55,7 @@ public abstract class AbstractExistentialFinder extends OWLObjectVisitorAdapter 
 
     private Set<OWLObject> visitedObjects = new HashSet<OWLObject>();
 
-    public AbstractExistentialFinder(Set<OWLOntology> onts) {
-    }
-
-
+    @Override
     public void visit(OWLSubClassOfAxiom owlSubClassAxiom) {
         if (!visitedObjects.contains(owlSubClassAxiom)){
             visitedObjects.add(owlSubClassAxiom); // prevent cycles
@@ -54,6 +63,7 @@ public abstract class AbstractExistentialFinder extends OWLObjectVisitorAdapter 
         }
     }
 
+    @Override
     public void visit(OWLEquivalentClassesAxiom owlEquivalentClassesAxiom) {
         if (!visitedObjects.contains(owlEquivalentClassesAxiom)){
             visitedObjects.add(owlEquivalentClassesAxiom); // prevent cycles
@@ -66,30 +76,37 @@ public abstract class AbstractExistentialFinder extends OWLObjectVisitorAdapter 
         }
     }
 
+    @Override
     public void visit(OWLObjectSomeValuesFrom restriction) {
         handleQuantifiedRestriction(restriction);
     }
 
+    @Override
     public void visit(OWLDataSomeValuesFrom restriction) {
         handleQuantifiedRestriction(restriction);
     }
 
+    @Override
     public void visit(OWLObjectMinCardinality restriction) {
         handleCardinality(restriction);
     }
 
+    @Override
     public void visit(OWLObjectExactCardinality restriction) {
         handleCardinality(restriction);
     }
 
+    @Override
     public void visit(OWLDataMinCardinality restriction){
         handleCardinality(restriction);
     }
 
+    @Override
     public void visit(OWLDataExactCardinality restriction){
         handleCardinality(restriction);
     }
 
+    @Override
     public void visit(OWLObjectIntersectionOf owlObjectIntersectionOf) {
         if (!visitedObjects.contains(owlObjectIntersectionOf)){
             visitedObjects.add(owlObjectIntersectionOf);

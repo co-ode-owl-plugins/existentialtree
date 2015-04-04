@@ -1,7 +1,5 @@
 package org.coode.outlinetree.util;
 
-import org.semanticweb.owlapi.model.*;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,6 +27,13 @@ import java.util.Set;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
+import org.semanticweb.owlapi.model.OWLPropertyExpression;
+import org.semanticweb.owlapi.model.OWLRestriction;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+
 /**
  * Author: drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -54,8 +59,8 @@ public class OutlinePropertyIndexer extends OutlineRestrictionVisitor {
 
     private Set<OWLClass> classesToInheritFrom = new HashSet<OWLClass>();
 
-    public OutlinePropertyIndexer(Set<OWLOntology> onts, int min) {
-        super(onts, min);
+    public OutlinePropertyIndexer(int min) {
+        super(min);
     }
     
     public Set<OWLPropertyExpression> getProperties() {
@@ -80,10 +85,12 @@ public class OutlinePropertyIndexer extends OutlineRestrictionVisitor {
         axiomMap.clear();
     }
 
+    @Override
     public void visit(OWLClass owlClass) {
         classesToInheritFrom.add(owlClass);
     }
 
+    @Override
     public void visit(OWLSubClassOfAxiom owlSubClassAxiom) {
         currentAxiom = owlSubClassAxiom;
         super.visit(owlSubClassAxiom);
@@ -91,12 +98,14 @@ public class OutlinePropertyIndexer extends OutlineRestrictionVisitor {
     }
 
 
+    @Override
     public void visit(OWLEquivalentClassesAxiom owlEquivalentClassesAxiom) {
         currentAxiom = owlEquivalentClassesAxiom;
         super.visit(owlEquivalentClassesAxiom);
         currentAxiom = null;
     }
 
+    @Override
     protected void handleRestriction(OWLRestriction restriction) {
         OWLPropertyExpression property = restriction.getProperty();
 

@@ -30,7 +30,6 @@ import org.protege.editor.owl.ui.selector.OWLObjectPropertySelectorPanel;
 import org.protege.editor.owl.ui.view.cls.AbstractOWLClassViewComponent;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataProperty;
-import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -48,6 +47,7 @@ import org.semanticweb.owlapi.model.OWLPropertyExpression;
  * Date: Mar 19, 2008<br><br>
  */
 public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent {
+    private static final long serialVersionUID = 1L;
 
     protected OutlineTreeModel model;
 
@@ -59,13 +59,13 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
 
     protected boolean ignoreUpdateView = false;
 
-    private boolean requiresRefresh = false;
+    protected boolean requiresRefresh = false;
 
     private Set<OWLPropertyExpression> propertyFilter = new HashSet<OWLPropertyExpression>();
 
 
     private OWLOntologyChangeListener ontListener = new OWLOntologyChangeListener(){
-        public void ontologiesChanged(java.util.List<? extends OWLOntologyChange> changes) throws OWLException {
+        public void ontologiesChanged(java.util.List<? extends OWLOntologyChange> changes) {
             refresh();
         }
     };
@@ -85,14 +85,18 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
     };
 
     protected DisposableAction addNodeAction = new DisposableAction("Add Some Restriction", OWLIcons.getIcon("class.add.sub.png")){
+        private static final long serialVersionUID = 1L;
         public void actionPerformed(ActionEvent actionEvent) {
             handleAddNode();
         }
+        @Override
         public void dispose() {
         }
     };
 
     private DisposableAction filterPropertiesAction = new DisposableAction("Filter properties", OWLIcons.getIcon("property.object.png")){
+        private static final long serialVersionUID = 1L;
+        @Override
         public void dispose() {
         }
 
@@ -102,6 +106,8 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
     };
 
     private DisposableAction clearFiltersAction = new DisposableAction("Clear filters (Follow all properties)", OWLIcons.getIcon("property.object.delete.png")){
+        private static final long serialVersionUID = 1L;
+        @Override
         public void dispose() {
         }
 
@@ -110,12 +116,12 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         }
     };
 
-    private OWLObjectPropertySelectorPanel objPropSel;
-    private OWLDataPropertySelectorPanel dataPropSel;
+    protected OWLObjectPropertySelectorPanel objPropSel;
+    protected OWLDataPropertySelectorPanel dataPropSel;
 
-    private JCheckBox selectAllObjectPropsCheckbox;
+    protected JCheckBox selectAllObjectPropsCheckbox;
 
-    private JCheckBox selectAllDataPropsCheckbox;
+    protected JCheckBox selectAllDataPropsCheckbox;
 
     private ActionListener propCheckboxListener = new ActionListener(){
         public void actionPerformed(ActionEvent actionEvent) {
@@ -124,9 +130,9 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         }
     };
 
-    private JCheckBox minZeroCB;
-    private JCheckBox showInheritedCB;
-    private JCheckBox showAssertedCB;
+    protected JCheckBox minZeroCB;
+    protected JCheckBox showInheritedCB;
+    protected JCheckBox showAssertedCB;
 
     private ActionListener minZeroChangeListener = new ActionListener(){
         public void actionPerformed(ActionEvent event) {
@@ -149,7 +155,8 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         }
     };
 
-    public void initialiseClassView() throws Exception {
+    @Override
+    public void initialiseClassView() {
         setLayout(new BorderLayout());
 
         getOWLModelManager().addOntologyChangeListener(ontListener);
@@ -180,6 +187,7 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         clearFiltersAction.setEnabled(false);
     }
 
+    @Override
     public void disposeView() {
         getOWLModelManager().removeOntologyChangeListener(ontListener);
         getOWLModelManager().removeListener(mngrListener);
@@ -241,6 +249,7 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
     }
 
 
+    @Override
     protected OWLClass updateView(OWLClass selectedClass) {
         if (isSynchronizing()){
             if (!ignoreUpdateView){
@@ -252,6 +261,7 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         return selectedClass;
     }
 
+    @Override
     protected void updateHeader(OWLObject object) {
         String str = "(" + propertyLabel + ")";
         if (object != null){
@@ -280,7 +290,7 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
     }
 
 
-    private void handleAddNode() {
+    protected void handleAddNode() {
         String errMessage = null;
         if (currentSelection != null && currentSelection.isEditable()){
             OWLObject value = getValue(currentSelection.getTypeOfChild());
@@ -312,8 +322,7 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
         return null;
     }
 
-
-    private void handleFilterProperties() {
+    protected void handleFilterProperties() {
         Set<OWLProperty> props = getFilterProperties();
         if (!props.isEmpty()){
             propertyLabel = "";
@@ -387,7 +396,7 @@ public abstract class AbstractOutlineView extends AbstractOWLClassViewComponent 
     }
 
 
-    private void handleClearProperty() {
+    protected void handleClearProperty() {
         propertyLabel = ALL_PROPERTIES;
         propertyFilter.clear();
         refresh();
